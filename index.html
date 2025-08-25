@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIPAT-LJ - Início</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0d1117, #1b1f27);
+      color: #fff;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #161b22;
+      padding: 14px 32px;
+      margin: 30px auto;
+      border-radius: 50px;
+      max-width: 960px;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      border: 1px solid #00ff88;
+    }
+    
+    .pill-navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00ff88;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .nav-links a {
+      padding: 8px 20px;
+      text-decoration: none;
+      font-weight: 500;
+      background-color: #1f2630;
+      color: #ccc;
+      border-radius: 30px;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background-color: #00ff88;
+      color: #000;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 60px 40px;
+      gap: 40px;
+      flex-wrap: wrap;
+      max-width: 960px;
+      margin: 0 auto 40px auto;
+    }
+
+    .hero-text {
+      max-width: 500px;
+    }
+
+    .hero-text h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .hero-text p {
+      color: #aaa;
+      font-size: 1rem;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    .hero-text button {
+      background: #00ff88;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .hero-text button:hover {
+      background: #00cc6a;
+    }
+
+    .hero-img img {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+    }
+
+    .section {
+      padding: 40px;
+      background: #10141c;
+      margin: 20px auto;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
+      max-width: 1200px; 
+      width: 90%;        
+      box-sizing: border-box;
+    }
+
+    .section h2 {
+      color: #00ff88;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background-color: #1a1d2e;
+      color: #00ff88;
+    }
+
+    form input,
+    form textarea,
+    form button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    form input,
+    form textarea {
+      background: #1f2230;
+      color: #fff;
+      resize: vertical;
+    }
+
+    form input:focus,
+    form textarea:focus {
+      outline: 2px solid #00ff88;
+      background: #292d3a;
+    }
+
+    form button {
+      background: #00ff88;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    form button:hover {
+      background-color: #00cc6a;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="pill-navbar">
+    <div class="logo">SIPAT-LJ</div>
+    <nav class="nav-links">
+      <a href="#" class="active">Início</a>
+      <a href="equipamentos.html">Equipamentos</a>
+      <a href="#relato">Relatar</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>CONTROLE MODERNO E INTEGRADO DO PATRIMÔNIO</h1>
+      <p>
+        Gerencie facilmente os equipamentos do IFAP - Laranjal do Jari com uma plataforma intuitiva e moderna.<br />
+        Relate problemas, visualize o status e contribua com a organização do campus de forma prática.
+      </p>
+      <button onclick="document.getElementById('relato').scrollIntoView({ behavior: 'smooth' })">
+        Relatar Problema
+      </button>
+    </div>
+    <div class="hero-img">
+      <img src="https://storyset.com/images/technology/monitoring-amico.svg" alt="Ilustração de Monitoramento" />
+    </div>
+  </section>
+
+  <section id="equipamentos" class="section">
+    <h2>Equipamentos por Setor</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Setor</th>
+          <th>Equipamento</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Laboratório de Informática 1</td>
+          <td>Computador 01</td>
+          <td>Funcionando</td>
+        </tr>
+        <tr>
+          <td>Laboratório de Física</td>
+          <td>Projetor</td>
+          <td>Com problema</td>
+        </tr>
+        <tr>
+          <td>Biblioteca</td>
+          <td>Scanner</td>
+          <td>Funcionando</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="relato" class="section">
+    <h2>Relatar Problema</h2>
+    <form onsubmit="enviarRelato(event)">
+      <input type="text" placeholder="Identificacao do Equipamento" required />
+      <textarea placeholder="Descreva o problema" rows="4" required></textarea>
+      <button type="submit">Enviar Relato</button>
+    </form>
+  </section>
+
+  <script>
+    function enviarRelato(event) {
+      event.preventDefault(); 
+
+      const form = event.target;
+      const equipamento = form.querySelector('input').value.trim();
+      const problema = form.querySelector('textarea').value.trim();
+
+      if (equipamento && problema) {
+        alert(Relato enviado!\n\nEquipamento: ${equipamento}\nProblema: ${problema});
+        form.reset();
+      } else {
+        alert('Por favor, preencha todos os campos.');
+      }
+    }
+  </script>
+</body>
+</html>
