@@ -1,176 +1,122 @@
-// ========================= CONFIGURAÇÃO =========================
-// Define a URL base da tua API Flask
-const API_URL = "http://localhost:5000"; // Ajuste conforme o IP/porta da tua API
+const API_URL = "http://localhost:5000";
 
-// ========================= LOGIN =========================
-// Página: login.html
+// Login
 async function login(event) {
   event.preventDefault();
   const user = document.getElementById('usuario').value;
   const pass = document.getElementById('senha').value;
 
   try {
-    const response = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usuario: user, senha: pass })
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("✅ Login bem-sucedido!");
+    const data = await res.json();
+    if (res.ok) {
       localStorage.setItem("usuario", user);
       window.location.href = "index.html";
     } else {
-      alert(data.mensagem || "❌ Usuário ou senha incorretos!");
+      alert(data.mensagem || "Usuário ou senha incorretos.");
     }
-  } catch (error) {
-    console.error("Erro ao tentar logar:", error);
-    alert("⚠️ Erro de conexão com o servidor.");
+  } catch (err) {
+    alert("Erro de conexão com o servidor.");
+    console.error(err);
   }
 }
 
-// ========================= LOGOUT =========================
-// Pode ser chamado por um botão em qualquer página
+// Logout
 function logout() {
   localStorage.removeItem("usuario");
   window.location.href = "login.html";
 }
 
-// ========================= VERIFICAR LOGIN =========================
-// Para proteger páginas que exigem login (index, equipamentos, etc.)
+// Verifica login
 function verificarLogin() {
-  const usuario = localStorage.getItem("usuario");
-  if (!usuario) {
-    alert("⚠️ Você precisa estar logado para acessar esta página.");
+  if (!localStorage.getItem("usuario")) {
     window.location.href = "login.html";
   }
 }
 
-// ========================= RELATAR PROBLEMA =========================
-// Página: relatar.html
+// Enviar relato
 async function enviarRelato(event) {
   event.preventDefault();
-
-  const equipamento = document.querySelector("input[type='text']").value;
+  const identificacao = document.querySelector("input[type='text']").value;
   const descricao = document.querySelector("textarea").value;
 
   try {
-    const response = await fetch(`${API_URL}/insobj`, {
+    const res = await fetch(`${API_URL}/insobj`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        identificacao: equipamento,
-        descricao: descricao
-      })
+      body: JSON.stringify({ identificacao, descricao })
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("✅ Relato enviado com sucesso!");
+    const data = await res.json();
+    if (res.ok) {
+      alert("Relato enviado com sucesso!");
       document.querySelector("form").reset();
     } else {
-      alert(data.mensagem || "❌ Erro ao enviar relato.");
+      alert(data.mensagem || "Erro ao enviar relato.");
     }
-  } catch (error) {
-    console.error("Erro ao enviar relato:", error);
-    alert("⚠️ Erro de conexão com o servidor.");
+  } catch (err) {
+    console.error(err);
+    alert("Erro de conexão com o servidor.");
   }
 }
 
-// ========================= LISTAR PATRIMÔNIOS =========================
-// Página: equipamentos.html
+// Carregar patrimônios
 async function carregarPatrimonios() {
+  const container = document.getElementById("lista-patrimonios");
+  if (!container) return;
+
   try {
-    const response = await fetch(`${API_URL}/patrimonio`);
-    const data = await response.json();
+    const res = await fetch(`${API_URL}/patrimonio`);
+    const data = await res.json();
 
-    if (response.ok) {
-      const container = document.getElementById("lista-patrimonios");
-      if (!container) return;
-
-      container.innerHTML = "";
-      data.forEach(item => {
-        const card = document.createElement("div");
-        card.classList.add("equipamento-card");
-        card.innerHTML = `
+    if (res.ok) {
+      container.innerHTML = data.map(item => `
+        <div class="equipamento-card">
           <h3>${item.nome}</h3>
           <p><strong>Tombo:</strong> ${item.tombo}</p>
           <p><strong>Setor:</strong> ${item.setor}</p>
           <p><strong>Status:</strong> ${item.status}</p>
-        `;
-        container.appendChild(card);
-      });
+        </div>
+      `).join('');
     } else {
-      alert("❌ Erro ao carregar patrimônios.");
+      container.innerHTML = "<p>Erro ao carregar equipamentos.</p>";
     }
-  } catch (error) {
-    console.error("Erro ao buscar patrimônios:", error);
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Erro ao conectar com a API.</p>";
   }
 }
 
-// ========================= FILTRAR POR TOMBO =========================
-// Página: index.html (ou qualquer uma que tenha busca)
+// Filtro por tombo
 async function filtrarPorTombo() {
   const tombo = document.getElementById("input-tombo").value;
-  if (!tombo) {
-    alert("⚠️ Informe um número de tombo!");
-    return;
-  }
+  if (!tombo) return alert("Informe o número do tombo.");
+
+  const container = document.getElementById("resultado-filtro");
 
   try {
-    const response = await fetch(`${API_URL}/filtpatrimonio/${tombo}`);
-    const data = await response.json();
+    const res = await fetch(`${API_URL}/filtpatrimonio/${tombo}`);
+    const data = await res.json();
 
-    const container = document.getElementById("resultado-filtro");
-    if (!container) return;
-    container.innerHTML = "";
-
-    if (response.ok && data.length > 0) {
-      data.forEach(item => {
-        const card = document.createElement("div");
-        card.classList.add("equipamento-card");
-        card.innerHTML = `
+    if (res.ok && data.length > 0) {
+      container.innerHTML = data.map(item => `
+        <div class="equipamento-card">
           <h3>${item.nome}</h3>
           <p><strong>Tombo:</strong> ${item.tombo}</p>
           <p><strong>Setor:</strong> ${item.setor}</p>
           <p><strong>Status:</strong> ${item.status}</p>
-        `;
-        container.appendChild(card);
-      });
+        </div>
+      `).join('');
     } else {
       container.innerHTML = "<p>Nenhum equipamento encontrado.</p>";
     }
-  } catch (error) {
-    console.error("Erro ao buscar por tombo:", error);
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Erro de conexão com a API.</p>";
   }
 }
-
-// ========================= CADASTRAR NOVO USUÁRIO =========================
-// (Opcional) Caso a tua API Flask tenha rota /cadastro
-async function cadastrarUsuario(usuario, senha) {
-  try {
-    const response = await fetch(`${API_URL}/cadastro`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usuario, senha })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("✅ Usuário cadastrado com sucesso!");
-    } else {
-      alert(data.mensagem || "❌ Erro ao cadastrar usuário.");
-    }
-  } catch (error) {
-    console.error("Erro ao cadastrar:", error);
-  }
-}
-
-// ===============================================================
-// DICA: Se quiser rodar testes, abre o console (F12) no navegador
-// e executa manualmente: login(), enviarRelato(), filtrarPorTombo()
-// ===============================================================
