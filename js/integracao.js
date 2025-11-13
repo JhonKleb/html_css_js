@@ -1,122 +1,93 @@
-const API_URL = "http://localhost:5000";
+// js/integracao.js
+const API_URL = "http://localhost:5000"; // usa localhost como tu mencionou
 
-// Login
+// --- LOGIN ---
 async function login(event) {
   event.preventDefault();
-  const user = document.getElementById('usuario').value;
-  const pass = document.getElementById('senha').value;
+  const usuario = document.getElementById("usuario").value;
+  const senha = document.getElementById("senha").value;
 
   try {
-    const res = await fetch(`${API_URL}/login`, {
+    const resposta = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usuario: user, senha: pass })
+      body: JSON.stringify({ usuario, senha }),
     });
 
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem("usuario", user);
+    const dados = await resposta.json();
+
+    if (resposta.ok) {
+      localStorage.setItem("token", dados.token);
+      localStorage.setItem("usuario", usuario);
       window.location.href = "index.html";
     } else {
-      alert(data.mensagem || "Usuário ou senha incorretos.");
+      alert(dados.mensagem || "Usuário ou senha incorretos!");
     }
-  } catch (err) {
-    alert("Erro de conexão com o servidor.");
-    console.error(err);
+  } catch (erro) {
+    console.error("Erro no login:", erro);
+    alert("Erro ao conectar ao servidor.");
   }
 }
 
-// Logout
+// --- LOGOUT ---
 function logout() {
+  localStorage.removeItem("token");
   localStorage.removeItem("usuario");
   window.location.href = "login.html";
 }
 
-// Verifica login
+// --- VERIFICA LOGIN ---
 function verificarLogin() {
-  if (!localStorage.getItem("usuario")) {
+  const token = localStorage.getItem("token");
+  if (!token) {
     window.location.href = "login.html";
   }
 }
 
-// Enviar relato
-async function enviarRelato(event) {
-  event.preventDefault();
-  const identificacao = document.querySelector("input[type='text']").value;
-  const descricao = document.querySelector("textarea").value;
-
-  try {
-    const res = await fetch(`${API_URL}/insobj`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identificacao, descricao })
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert("Relato enviado com sucesso!");
-      document.querySelector("form").reset();
-    } else {
-      alert(data.mensagem || "Erro ao enviar relato.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Erro de conexão com o servidor.");
-  }
-}
-
-// Carregar patrimônios
+// --- LISTAR PATRIMÔNIOS ---
 async function carregarPatrimonios() {
-  const container = document.getElementById("lista-patrimonios");
-  if (!container) return;
-
   try {
-    const res = await fetch(`${API_URL}/patrimonio`);
-    const data = await res.json();
+    const resposta = await fetch(`${API_URL}/patrimonio`);
+    const dados = await resposta.json();
 
-    if (res.ok) {
-      container.innerHTML = data.map(item => `
-        <div class="equipamento-card">
-          <h3>${item.nome}</h3>
-          <p><strong>Tombo:</strong> ${item.tombo}</p>
-          <p><strong>Setor:</strong> ${item.setor}</p>
-          <p><strong>Status:</strong> ${item.status}</p>
-        </div>
-      `).join('');
-    } else {
-      container.innerHTML = "<p>Erro ao carregar equipamentos.</p>";
-    }
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "<p>Erro ao conectar com a API.</p>";
+    const container = document.getElementById("lista-patrimonios");
+    container.innerHTML = "";
+
+    dados.forEach(item => {
+      const div = document.createElement("div");
+      div.classList.add("equipamento-item");
+      div.innerHTML = `
+        <p><strong>${item.nome}</strong></p>
+        <p>Tombo: ${item.tombo}</p>
+        <p>Status: ${item.status}</p>
+      `;
+      container.appendChild(div);
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar patrimônios:", erro);
   }
 }
 
-// Filtro por tombo
+// --- FILTRAR POR TOMBO ---
 async function filtrarPorTombo() {
   const tombo = document.getElementById("input-tombo").value;
-  if (!tombo) return alert("Informe o número do tombo.");
-
-  const container = document.getElementById("resultado-filtro");
+  if (!tombo) return alert("Digite um número de tombo.");
 
   try {
-    const res = await fetch(`${API_URL}/filtpatrimonio/${tombo}`);
-    const data = await res.json();
+    const resposta = await fetch(`${API_URL}/filtpatrimonio/${tombo}`);
+    const dados = await resposta.json();
 
-    if (res.ok && data.length > 0) {
-      container.innerHTML = data.map(item => `
-        <div class="equipamento-card">
-          <h3>${item.nome}</h3>
-          <p><strong>Tombo:</strong> ${item.tombo}</p>
-          <p><strong>Setor:</strong> ${item.setor}</p>
-          <p><strong>Status:</strong> ${item.status}</p>
-        </div>
-      `).join('');
+    const container = document.getElementById("resultado-filtro");
+    if (resposta.ok && dados.length > 0) {
+      container.innerHTML = `
+        <p><strong>${dados[0].nome}</strong></p>
+        <p>Tombo: ${dados[0].tombo}</p>
+        <p>Status: ${dados[0].status}</p>
+      `;
     } else {
       container.innerHTML = "<p>Nenhum equipamento encontrado.</p>";
     }
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "<p>Erro de conexão com a API.</p>";
+  } catch (erro) {
+    console.error("Erro ao buscar tombo:", erro);
   }
 }
