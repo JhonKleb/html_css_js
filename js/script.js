@@ -1,7 +1,5 @@
-// ===== CONFIGURAÇÃO =====
 const API_URL = "http://localhost:5000";  // usa localhost como você pediu
 
-// ===== LOGIN =====
 async function login(event) {
     event.preventDefault();
 
@@ -28,7 +26,7 @@ async function login(event) {
         if (response.ok) {
             alert("Login realizado com sucesso!");
             localStorage.setItem("matricula", matricula);
-            window.location.href = "index.html";  // redireciona após login
+            window.location.href = "index.html";
         } else {
             alert(data.message || "Matrícula ou senha incorretos!");
         }
@@ -39,25 +37,19 @@ async function login(event) {
     }
 }
 
-// =========================
-//  ENVIAR RELATO (INSOBJ)
-// =========================
 async function enviarRelato(event) {
     event.preventDefault();
 
-    // Captura correta dos campos do formulário
     const tombo = document.getElementById("tombo").value.trim();
     const matricula = document.getElementById("matricula").value.trim();
     const localizacao = document.getElementById("localizacao").value.trim();
     const descricao = document.getElementById("descricao").value.trim();
 
-    // Verificação obrigatória
     if (!tombo || !matricula || !localizacao || !descricao) {
         alert("Erro: Todos os campos são obrigatórios!");
         return;
     }
 
-    // Corpo EXATO que a API espera
     const denunciaData = {
         "Tombo": tombo,
         "Matrícula": matricula,
