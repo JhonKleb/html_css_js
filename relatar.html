@@ -19,13 +19,26 @@
 
   <section class="section">
     <h2>Relatar Problema</h2>
+
     <form onsubmit="enviarRelato(event)">
-      <input type="text" placeholder="Identificação do Equipamento" required />
-      <textarea placeholder="Descreva o problema" required></textarea>
+
+      <!-- Tombo -->
+      <input type="text" id="tombo" placeholder="Identificação do Equipamento (Tombo)" required>
+
+      <!-- Matrícula agora é digitada pelo usuário -->
+      <input type="text" id="matricula" placeholder="Sua Matrícula" required>
+
+      <!-- Localização -->
+      <input type="text" id="localizacao" placeholder="Localização do Equipamento" required>
+
+      <!-- Descrição -->
+      <textarea id="descricao" placeholder="Descreva o problema" required></textarea>
+
       <button type="submit">Enviar Relato</button>
     </form>
+
   </section>
 
-  <script src="./js/integracao.js"></script>
+  <script src="./js/script.js"></script>
 </body>
 </html>
