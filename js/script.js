@@ -40,31 +40,29 @@ async function login(event) {
 }
 
 // =========================
-//  ENVIAR RELATO (classe InserirObjeto da API)
+//  ENVIAR RELATO (INSOBJ)
 // =========================
 async function enviarRelato(event) {
     event.preventDefault();
 
-    const inputs = document.querySelectorAll("form input, form textarea");
+    // Captura correta dos campos do formulário
+    const tombo = document.getElementById("tombo").value.trim();
+    const matricula = document.getElementById("matricula").value.trim();
+    const localizacao = document.getElementById("localizacao").value.trim();
+    const descricao = document.getElementById("descricao").value.trim();
 
-    const tombo = inputs[0].value.trim();
-    const descricao = inputs[1].value.trim();
-
-    // 🔐 matrícula do usuário logado (salva no login.js)
-    const matricula = localStorage.getItem("matricula");
-
-    if (!matricula) {
-        alert("Erro: Nenhum usuário logado. Faça login novamente.");
-        window.location.href = "login.html";
+    // Verificação obrigatória
+    if (!tombo || !matricula || !localizacao || !descricao) {
+        alert("Erro: Todos os campos são obrigatórios!");
         return;
     }
 
-    // 🔥 Corpo EXATO que a API Flask espera
+    // Corpo EXATO que a API espera
     const denunciaData = {
         "Tombo": tombo,
-        "Matrícula": parseInt(matricula),
+        "Matrícula": matricula,
         "Descrição": descricao,
-        "Localização": "Não informada"
+        "Localização": localizacao
     };
 
     try {
@@ -80,8 +78,10 @@ async function enviarRelato(event) {
 
         if (response.ok) {
             alert("Relato enviado com sucesso!");
-            inputs[0].value = "";
-            inputs[1].value = "";
+            document.getElementById("tombo").value = "";
+            document.getElementById("matricula").value = "";
+            document.getElementById("localizacao").value = "";
+            document.getElementById("descricao").value = "";
         } else {
             alert("Erro ao enviar relato: " + (data.message || "Erro desconhecido"));
         }
