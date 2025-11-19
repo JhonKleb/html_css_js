@@ -3,21 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIPAT-LJ - Login</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Login - SIPAT-LJ</title>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body class="dark-theme">
+
   <div class="login-container">
+
+    <img src="c:\Users\Wal Aquino\OneDrive\Área de Trabalho\Screenshots\Marca-Ifap-Campus-Laranjal-do-Jari-Horizontal-Negativo.png" 
+    alt="Instituto Federal Amapá - Campus Laranjal do Jari" 
+    class="logo"
+    style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
+
     <div class="login-box">
-      <div class="title"><span class="highlight">SIPAT-LJ</span></div>
-      <div class="subtitle">Acesso restrito</div>
+      <h1 class="title"><span class="highlight">SIPAT</span>-LJ</h1>
+      <p class="subtitle">Sistema Integrado de Patrimônio</p>
+
       <form onsubmit="login(event)">
         <input type="text" id="usuario" placeholder="Usuário" required>
         <input type="password" id="senha" placeholder="Senha" required>
         <button type="submit">Entrar</button>
       </form>
+      
+      <div class="extras">
+        <a href="conta.html" class="create-account-btn">Criar uma conta</a>
+      </div>
+
     </div>
   </div>
+
   <script src="./js/script.js"></script>
 </body>
-</html>
+</html
