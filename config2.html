@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar Perfil</title>
+
+<style>
+
+    body {
+        background: #0c0f13;
+        font-family: Arial, sans-serif;
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    .perfil-card {
+        width: 85%;
+        max-width: 950px;
+        margin: 60px auto;
+        background: rgba(20, 22, 28, 0.8);
+        padding: 40px;
+        border-radius: 26px;
+        border: 2px solid rgba(0, 255, 120, 0.25);
+    }
+
+    .perfil-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .perfil-header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .perfil-header p {
+        margin-top: 6px;
+        font-size: 16px;
+        color: #00ff88;
+    }
+
+    .perfil-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .foto {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        object-fit: cover;
+    }
+
+    .nome-edit {
+        background: #121418;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #00ff88;
+        font-size: 16px;
+        width: 150px;
+    }
+
+    .perfil-icons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 30px;
+        margin-top: 45px;
+    }
+
+    .icon-item {
+        text-align: center;
+        cursor: pointer;
+        padding: 16px;
+        border-radius: 18px;
+        transition: 0.25s;
+        border: 2px solid transparent;
+    }
+
+    .icon-item img {
+        width: 110px;
+        height: 110px;
+        border-radius: 14px;
+        object-fit: cover;
+    }
+
+    .icon-item.selected {
+        border: 2px solid #00ff88;
+        box-shadow: 0 0 12px rgba(0, 255, 120, 0.28);
+    }
+
+    .upload-item {
+        border: 2px dashed #00ff88;
+        padding: 20px;
+        border-radius: 18px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+    .upload-item:hover {
+        background: rgba(0, 255, 120, 0.1);
+    }
+
+    .upload-item span {
+        display: block;
+        margin-top: 10px;
+        color: #00ff88;
+        font-weight: 600;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 18px;
+        margin-top: 45px;
+    }
+
+    .confirmar,
+    .voltar {
+        padding: 14px 38px;
+        border-radius: 30px;
+        border: none;
+        cursor: pointer;
+        font-size: 17px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .confirmar {
+        background: #00ff88;
+        color: #000;
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .confirmar.ativo {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    .voltar {
+        background: transparent;
+        color: #00ff88;
+        border: 2px solid #00ff88;
+    }
+
+    .msg-sucesso {
+        display: none;
+        margin-top: 20px;
+        padding: 12px;
+        background: rgba(0, 255, 120, 0.2);
+        border: 1px solid #00ff88;
+        border-radius: 10px;
+        color: #00ff88;
+        text-align: center;
+    }
+
+</style>
+
+</head>
+<body>
+
+<div class="perfil-card">
+
+    <div class="perfil-header">
+        <div>
+            <h1>EDITAR PERFIL</h1>
+            <p>Escolha o novo ícone do seu perfil</p>
+        </div>
+
+        <div class="perfil-user">
+            <img id="fotoAtual" src="icone-atual.png" class="foto">
+            <div>
+                <input class="nome-edit" id="nomeInput" value="ARRUDA">
+            </div>
+        </div>
+    </div>
+
+    <div class="perfil-icons">
+
+        <div class="icon-item"><img src="https://i.ibb.co/Ldtcdtsq/e931d9116ff50191b17d4bc22eebaffc.jpg"><span>Bryan</span></div>
+        <div class="icon-item"><img src="https://i.ibb.co/5xTq632v/4b09fb638a6753888eaaae2a299324b2.jpg"><span>Gustavo</span></div>
+        <div class="icon-item"><img src="https://i.ibb.co/99BMDHng/5c39f233c7fec9c7bc0b3861119659f0.jpg"><span>Eduarda</span></div>
+        <div class="icon-item"><img src="https://i.ibb.co/Y7ZLnXJG/11997a5f97d37e5af0436bdd61b37988.jpg"><span>Sophia</span></div>
+        <div class="upload-item" id="uploadIcon">
+            <img src="https://cdn-icons-png.flaticon.com/512/1829/1829586.png" style="width:80px; opacity:0.7;">
+            <span>Adicionar Foto</span>
+        </div>
+
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <div class="buttons">
+        <button class="confirmar" id="btnConfirmar">Concluir</button>
+        <button class="voltar" onclick="window.location.href='confi.html'">Voltar</button>
+    </div>
+
+    <div class="msg-sucesso" id="msgSucesso">Salvo</div>
+
+</div>
+
+<script>
+    const icons = document.querySelectorAll(".icon-item");
+    const btn = document.getElementById("btnConfirmar");
+    const msg = document.getElementById("msgSucesso");
+    const fotoAtual = document.getElementById("fotoAtual");
+    const nomeInput = document.getElementById("nomeInput");
+
+    let alterou = false;
+
+    const fotoSalva = localStorage.getItem("fotoPerfil");
+    if (fotoSalva) {
+        fotoAtual.src = fotoSalva;
+    }
+
+    const nomeSalvo = localStorage.getItem("nomeUsuario");
+    if (nomeSalvo) {
+        nomeInput.value = nomeSalvo;
+    }
+
+    icons.forEach(icon => {
+        icon.addEventListener("click", () => {
+            icons.forEach(i => i.classList.remove("selected"));
+            icon.classList.add("selected");
+
+            const novaFoto = icon.querySelector("img").src;
+            fotoAtual.src = novaFoto;
+
+            ativarSalvar();
+        });
+    });
+
+    nomeInput.addEventListener("input", () => ativarSalvar());
+
+    function ativarSalvar() {
+        alterou = true;
+        btn.classList.add("ativo");
+    }
+
+    const uploadIcon = document.getElementById("uploadIcon");
+    const fileInput = document.getElementById("fileInput");
+
+    uploadIcon.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", () => {
+        const arquivo = fileInput.files[0];
+        if (!arquivo) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            fotoAtual.src = reader.result; 
+            ativarSalvar();
+        };
+        reader.readAsDataURL(arquivo);
+    });
+
+    btn.addEventListener("click", () => {
+        if (!alterou) return;
+
+        localStorage.setItem("fotoPerfil", fotoAtual.src);
+        
+        localStorage.setItem("nomeUsuario", nomeInput.value);
+
+        msg.style.display = "block";
+        setTimeout(() => msg.style.display = "none", 2500);
+
+        btn.classList.remove("ativo");
+        alterou = false;
+    });
+</script>
+
+</body>
+</html>
