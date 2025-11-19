@@ -1,31 +1,531 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SIPAT-LJ - Equipamentos</title>
-  <link rel="stylesheet" href="css/style.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
   <style>
-    /* mantém os estilos do seu HTML anterior */
+    :root{
+      --bg:#0d1117;
+      --panel:#10141c;
+      --card:#1a1d2e;
+      --neon:#00ff88;
+      --muted:#bfc5c2;
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;
+      background: linear-gradient(135deg,var(--bg), #1b1f27);
+      color:#fff;
+      min-height:100vh;
+      padding:28px 18px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    header.pill-navbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#161b22;
+      padding:14px 32px;
+      margin:0 auto 22px auto;
+      border-radius:50px;
+      max-width:1100px;
+      width:100%;
+      border:1px solid var(--neon);
+    }
+
+    .logo{
+      font-size:1.5rem;
+      font-weight:700;
+      color:var(--neon);
+    }
+
+    .nav-links{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .nav-links a{
+      padding:8px 20px;
+      text-decoration:none;
+      font-weight:500;
+      background:#1f2630;
+      color:#ccc;
+      border-radius:30px;
+      transition:.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active{
+      background:var(--neon);
+      color:#000;
+    }
+
+    .profile-pic{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      object-fit:cover;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .profile-pic:hover{
+      transform:scale(1.05);
+    }
+
+    .container{width:100%;max-width:1100px;}
+
+    .section{
+      background:var(--panel);
+      padding:26px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,136,0.06);
+    }
+
+    h2{
+      color:var(--neon);
+      margin:0 0 18px;
+      border-bottom:2px solid rgba(0,255,136,0.06);
+      padding-bottom:10px;
+    }
+
+    .action-buttons{
+      display:flex;
+      justify-content:flex-start;
+      margin-bottom:15px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .accordion-item{
+      margin-bottom:12px;
+      background:var(--card);
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid rgba(0,255,136,0.04);
+      transition:transform 0.25s ease;
+    }
+
+    .accordion-item:hover{
+      transform: translateY(-1px);
+    }
+
+    .accordion-header{
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      cursor:pointer;
+      color:var(--neon);
+      font-weight:600;
+      transition:background .25s ease, color .25s ease;
+    }
+
+    .accordion-header:hover{
+      background:rgba(0,255,136,0.08);
+    }
+
+    .accordion-header::after{
+      content:'+';
+      font-size:20px;
+      transition:transform 0.3s ease, color 0.3s ease;
+    }
+
+    .accordion-header.active::after{
+      content:'−';
+      transform:rotate(180deg);
+      color:var(--neon);
+    }
+
+    .accordion-content{
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transform:translateY(-10px);
+      transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease, padding 0.4s ease;
+      padding:0 18px;
+    }
+
+    .accordion-content.open{
+      max-height:1000px;
+      padding:12px 18px 18px 18px;
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{
+      padding:10px;
+      border-bottom:1px solid #23272f;
+      color:#ddd;
+      text-align:left;
+      font-size:14px;
+    }
+    th{color:var(--neon)}
+
+    .status-ok{color:var(--neon);font-weight:700}
+    .status-med{color:#e6d31e;font-weight:700}
+    .status-urg{color:#ff4444;font-weight:700}
+
+    .btn-detalhar{
+      background:var(--neon);
+      color:#000;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      transition:background .25s;
+    }
+
+    .btn-detalhar:hover{
+      background:#00cc6a;
+    }
+
+    .modal-bg{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index:9999;
+    }
+
+    .modal{
+      width:420px;
+      max-width:94%;
+      background:#161b22;
+      border-radius:12px;
+      padding:20px;
+      border:1px solid var(--neon);
+    }
+
+    .modal h3{margin:0 0 12px;color:var(--neon)}
+    .modal input, .modal select{
+      width:100%;
+      padding:8px;
+      margin-top:6px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:#0d1117;
+      color:#fff;
+    }
+
+    .modal p{margin:8px 0; color:#dfe6df; font-size:14px}
+    .modal .close{
+      margin-top:14px;background:#ff5555;color:#fff;
+      border:none;padding:8px 12px;border-radius:8px;cursor:pointer
+    }
   </style>
 </head>
-<body onload="verificarLogin(); carregarPatrimonios();">
-  <header>
+
+<body>
+
+  <header class="pill-navbar">
     <div class="logo">SIPAT-LJ</div>
-    <nav>
+
+    <nav class="nav-links">
       <a href="index.html">Início</a>
-      <a href="equipamentos.html" class="active">Equipamentos</a>
+      <a class="active">Equipamentos</a>
       <a href="relatar.html">Relatar</a>
-      <a href="#" onclick="logout()">Sair</a>
+
+      <a href="confi.html">
+        <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
+      </a>
     </nav>
   </header>
 
-  <section class="section">
-    <h2>Todos os Equipamentos</h2>
-    <div id="lista-patrimonios"></div>
-  </section>
+  <div class="container">
+    <section class="section">
+      <h2>Todos os Equipamentos por Setor</h2>
 
-  <script src="js/integracao.js"></script>
-  <script src="js/script.js"></script>
+      <div class="action-buttons">
+        <button id="btnAddEquip" class="btn-detalhar">Adicionar Equipamento</button>
+        <button id="btnAddSetor" class="btn-detalhar">Adicionar Setor</button>
+        <button id="btnDelSetor" class="btn-detalhar" style="background:#ff4444;color:#fff;">Apagar Setor</button>
+      </div>
+
+      <div id="accordionContainer"></div>
+    </section>
+  </div>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h3 id="modalTitle">Detalhes do Equipamento</h3>
+      <p id="md-tombo"></p>
+      <p id="md-matricula"></p>
+      <p id="md-desc"></p>
+      <p id="md-status"></p>
+      <p id="md-local"></p>
+      <p id="md-data"></p>
+      <button class="close" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modalAddSetor">
+    <div class="modal">
+      <h3>Adicionar Novo Setor</h3>
+      <input type="text" id="novoSetorNome" placeholder="Nome do setor">
+      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn-detalhar" onclick="adicionarSetor()">Adicionar</button>
+        <button class="close" onclick="fecharModalAddSetor()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modalDelSetor">
+    <div class="modal">
+      <h3>Apagar Setor</h3>
+      <select id="selecionarSetorDel"></select>
+      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="close" onclick="fecharModalDelSetor()">Cancelar</button>
+        <button class="btn-detalhar" style="background:#ff4444;color:#fff;" onclick="confirmarApagarSetor()">Apagar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modalAddEquip">
+    <div class="modal">
+      <h3>Adicionar Equipamento</h3>
+      <input type="text" id="equipTombo" placeholder="Tombo do equipamento">
+      <input type="text" id="equipNome" placeholder="Nome/Descrição do equipamento">
+      <select id="equipSetor">
+        <option value="">Selecione o setor</option>
+      </select>
+      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn-detalhar" onclick="adicionarEquipamento()">Adicionar</button>
+        <button class="close" onclick="fecharModalAddEquip()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+
+const navFoto = document.getElementById("navFoto");
+const fotoSalva = localStorage.getItem("fotoPerfil");
+if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
+
+let equipamentos = JSON.parse(localStorage.getItem("equipamentos")) || [];
+
+function salvarSetores(){ localStorage.setItem("setores", JSON.stringify(setores)); }
+function salvarEquipamentos(){ localStorage.setItem("equipamentos", JSON.stringify(equipamentos)); }
+
+const accordionContainer = document.getElementById("accordionContainer");
+
+function montarSetores(){
+  accordionContainer.innerHTML = "";
+
+  setores.forEach(setor => {
+    const bloco = document.createElement("div");
+    bloco.className = "accordion-item";
+    bloco.dataset.setor = setor;
+
+    bloco.innerHTML = `
+      <div class="accordion-header">
+        ${setor}
+      </div>
+      <div class="accordion-content">
+        <table>
+          <thead>
+            <tr>
+              <th>Tombo</th><th>Descrição</th><th>Status</th><th>Data</th><th>Detalhar</th><th>Excluir</th>
+            </tr>
+          </thead>
+          <tbody class="tbody-setor"></tbody>
+        </table>
+      </div>
+    `;
+
+    accordionContainer.appendChild(bloco);
+  });
+
+  initAccordion();
+  preencherEquipamentos();
+  atualizarOpcoesSetor();
+  atualizarSelectDeleteSetor();
+}
+
+function initAccordion(){
+  const headers = document.querySelectorAll('.accordion-header');
+  headers.forEach(header=>{
+    header.onclick = (e)=>{
+      const isOpen = header.classList.contains("active");
+      headers.forEach(h=>{
+        h.classList.remove("active");
+        h.nextElementSibling.classList.remove("open");
+      });
+      if(!isOpen){
+        header.classList.add("active");
+        header.nextElementSibling.classList.add("open");
+      }
+    };
+  });
+}
+
+function preencherEquipamentos(){
+  document.querySelectorAll(".tbody-setor").forEach(t=>t.innerHTML="");
+
+  equipamentos.forEach((item, index)=>{
+    const blocoSetor = document.querySelector(`[data-setor="${item.setor}"]`);
+    if (!blocoSetor) return;
+
+    const tbody = blocoSetor.querySelector(".tbody-setor");
+
+    let cls = item.status==="Urgente" ? "status-urg" :
+              item.status==="Médio"   ? "status-med" :
+                                         "status-ok";
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.tombo}</td>
+        <td>${item.descricao}</td>
+        <td class="${cls}">${item.status}</td>
+        <td>${item.data}</td>
+        <td><button class="btn-detalhar" onclick='abrirModal(${JSON.stringify(item)})'>Detalhar</button></td>
+        <td><button style="background:#ff4444; color:#fff; padding:6px 10px; border-radius:8px; border:none; cursor:pointer;" onclick="apagarEquipamento(${index})">Excluir</button></td>
+      </tr>
+    `;
+  });
+}
+
+function atualizarSelectDeleteSetor(){
+  const sel = document.getElementById("selecionarSetorDel");
+  sel.innerHTML = "";
+  setores.forEach(s=>{
+    sel.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+}
+
+function confirmarApagarSetor(){
+  const setor = document.getElementById("selecionarSetorDel").value;
+  if(!setor) return;
+  if(!confirm(`Tem certeza que deseja apagar o setor "${setor}" e todos os equipamentos dele?`)) return;
+
+  setores = setores.filter(s => s !== setor);
+  equipamentos = equipamentos.filter(e => e.setor !== setor);
+
+  salvarSetores();
+  salvarEquipamentos();
+  montarSetores();
+  fecharModalDelSetor();
+}
+
+function apagarEquipamento(index){
+  if(!confirm("Tem certeza que deseja apagar este equipamento?")) return;
+
+  equipamentos.splice(index, 1);
+  salvarEquipamentos();
+  montarSetores();
+}
+
+function abrirModal(o){
+  document.getElementById("md-tombo").innerHTML = "<b>Tombo:</b> " + o.tombo;
+  document.getElementById("md-matricula").innerHTML = "<b>Matrícula:</b> " + o.matricula;
+  document.getElementById("md-desc").innerHTML = "<b>Descrição:</b> " + o.descricao;
+  document.getElementById("md-status").innerHTML = "<b>Status:</b> " + o.status;
+  document.getElementById("md-local").innerHTML = "<b>Local:</b> " + o.local;
+  document.getElementById("md-data").innerHTML = "<b>Data:</b> " + o.data;
+
+  document.getElementById("modalBg").style.display = "flex";
+}
+
+function fecharModal(){ document.getElementById("modalBg").style.display = "none"; }
+
+const modalAddSetor = document.getElementById("modalAddSetor");
+const modalDelSetor = document.getElementById("modalDelSetor");
+const btnAddSetor = document.getElementById("btnAddSetor");
+const btnDelSetor = document.getElementById("btnDelSetor");
+const novoSetorInput = document.getElementById("novoSetorNome");
+
+btnAddSetor.onclick = ()=>{
+  novoSetorInput.value = "";
+  modalAddSetor.style.display = "flex";
+  novoSetorInput.focus();
+};
+
+btnDelSetor.onclick = ()=>{
+  atualizarSelectDeleteSetor();
+  modalDelSetor.style.display = "flex";
+};
+
+function fecharModalAddSetor(){ modalAddSetor.style.display = "none"; }
+function fecharModalDelSetor(){ modalDelSetor.style.display = "none"; }
+
+function adicionarSetor(){
+  const nome = novoSetorInput.value.trim();
+  if(!nome) return alert("Digite um nome válido.");
+
+  setores.push(nome);
+  salvarSetores();
+  montarSetores();
+  fecharModalAddSetor();
+}
+
+const modalAddEquip = document.getElementById("modalAddEquip");
+const btnAddEquip = document.getElementById("btnAddEquip");
+
+const equipTombo = document.getElementById("equipTombo");
+const equipNome = document.getElementById("equipNome");
+const equipSetor = document.getElementById("equipSetor");
+
+btnAddEquip.onclick = ()=>{
+  equipTombo.value = "";
+  equipNome.value = "";
+  modalAddEquip.style.display = "flex";
+};
+
+function fecharModalAddEquip(){ modalAddEquip.style.display = "none"; }
+
+function atualizarOpcoesSetor(){
+  equipSetor.innerHTML = '<option value="">Selecione o setor</option>';
+  setores.forEach(s=>{
+    equipSetor.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+}
+
+function adicionarEquipamento(){
+  const tombo = equipTombo.value.trim();
+  const nome = equipNome.value.trim();
+  const setor = equipSetor.value;
+
+  if(!tombo || !nome || !setor)
+    return alert("Preencha todos os campos.");
+
+  const dataAtual = new Date();
+  const dataFormatada =
+    `${dataAtual.getDate()}/${dataAtual.getMonth()+1}/${dataAtual.getFullYear()} ${dataAtual.getHours()}:${String(dataAtual.getMinutes()).padStart(2, "0")}`;
+
+  const novoItem = {
+    setor,
+    tombo,
+    descricao:nome,
+    status:"Ok",
+    local:setor,
+    data:dataFormatada,
+    matricula:"0000"
+  };
+
+  equipamentos.push(novoItem);
+  salvarEquipamentos();
+  montarSetores();
+  fecharModalAddEquip();
+}
+
+montarSetores();
+</script>
+
 </body>
 </html>
