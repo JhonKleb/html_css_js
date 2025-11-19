@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIPAT-LJ - Administrador</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0d1117, #1b1f27);
+      color: #fff;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #161b22;
+      padding: 14px 32px;
+      margin: 30px auto;
+      border-radius: 50px;
+      max-width: 960px;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      border: 1px solid #00ff88;
+    }
+
+    .pill-navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00ff88;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      padding: 8px 20px;
+      text-decoration: none;
+      font-weight: 500;
+      background-color: #1f2630;
+      color: #ccc;
+      border-radius: 30px;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background-color: #00ff88;
+      color: #000;
+    }
+
+    .profile-pic {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .section {
+      padding: 40px;
+      background: #10141c;
+      margin: 20px auto;
+      border-radius: 16px;
+      border: 1px solid rgba(0,255,136,0.25);
+      box-shadow: 0 0 25px rgba(0,255,136,0.12);
+      max-width: 1200px;
+      width: 90%;
+    }
+
+    .section h2 {
+      color: #00ff88;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1a1f27;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: #00ff88;
+      color: #000;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #161b22;
+    }
+
+    tbody tr:hover {
+      background: rgba(0,255,136,0.08);
+    }
+
+    .status-aberta { color: #ff4444; font-weight: bold; }
+    .status-andamento { color: #ffaa00; font-weight: bold; }
+    .status-resolvida { color: #00ff88; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+
+  <header class="pill-navbar">
+    <div class="logo">SIPAT-LJ</div>
+    <nav class="nav-links">
+      <a href="index.html">Início</a>
+      <a href="equipamentos.html">Equipamentos</a>
+      <a href="relatar.html">Relatar</a>
+      <a class="active">Administrador</a>
+      <a href="confi.html">
+        <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
+      </a>
+    </nav>
+  </header>
+
+  <section class="section">
+    <h2>Denúncias Registradas</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tombamento</th>
+          <th>Matrícula</th>
+          <th>Descrição</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Setor</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaDenuncias">
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    // Foto do perfil
+    const navFoto = document.getElementById("navFoto");
+    const fotoSalva = localStorage.getItem("fotoPerfil");
+    if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
+
+    // Carregar denúncias da API
+    async function carregarDenuncias() {
+      try {
+        const resp = await fetch("http://127.0.0.1:5000/denuncias");  // <-- coloque seu endpoint real
+        const dados = await resp.json();
+
+        const tabela = document.getElementById("tabelaDenuncias");
+        tabela.innerHTML = "";
+
+        dados.forEach(d => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${d.id_denuncia}</td>
+            <td>${d.tombo || "-"}</td>
+            <td>${d.matricula_al}</td>
+            <td>${d.descricao}</td>
+            <td class="status-${d.status.toLowerCase()}">${d.status}</td>
+            <td>${new Date(d.data_denuncia).toLocaleString()}</td>
+            <td>${d.setor || "-"}</td>
+          `;
+
+          tabela.appendChild(tr);
+        });
+
+      } catch (error) {
+        console.error("Erro ao carregar denúncias:", error);
+      }
+    }
+
+    carregarDenuncias();
+  </script>
+
+</body>
+</html>
