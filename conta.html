@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar conta no SIMPAT</title>
+  <style>
+    body {
+      font-family: "Inter", Arial, sans-serif;
+      background: #14171d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #ffffff;
+    }
+
+    .container {
+      background: #181b22;
+      padding: 35px;
+      border-radius: 20px;
+      width: 420px;
+
+      box-shadow: 
+        0 0 18px rgba(0,255,120,0.20),
+        0 0 45px rgba(0,255,120,0.10);
+
+      border: 1px solid rgba(0,255,120,0.22);
+      position: relative;
+      overflow: hidden;
+      animation: fade 0.6s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(12px);} 
+      to { opacity: 1; transform: translateY(0);} 
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 26px;
+      color: #00ff88;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #d2d2d2;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border-radius: 10px;
+      background: #0f1116;
+      border: 1px solid #2a2d34;
+      color: white;
+      transition: .25s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #00ff88;
+      background: #15181d;
+      box-shadow: 0 0 10px rgba(0,255,120,0.2);
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .checkbox-area {
+      margin-bottom: 22px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .checkbox-area a {
+      color: #00ff88;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .checkbox-area a:hover {
+      text-decoration: underline;
+      opacity: 0.8;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #00ff88;
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .25s ease;
+    }
+
+    button:hover {
+      background: #00e67a;
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(0,255,120,0.35);
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
+      background: radial-gradient(
+        circle,
+        rgba(0,255,120,0.08) 0%,
+        rgba(0,255,120,0) 55%
+      );
+      filter: blur(12px);
+      z-index: -1;
+    }
+
+    .logo-area {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      opacity: 0.9;
+    }
+
+    .logo-area img {
+      width: 130px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Criar conta no SIPAT</h2>
+
+    <label for="matricula">Matrícula</label>
+    <input type="text" id="matricula" placeholder="Digite sua matrícula" />
+
+    <label for="nome">Nome completo</label>
+    <input type="text" id="nome" placeholder="Digite seu nome completo" />
+
+    <label for="email">E-mail</label>
+    <input type="email" id="email" placeholder="Digite seu e-mail institucional" />
+
+    <label for="senha">Criar senha</label>
+    <input type="password" id="senha" placeholder="Crie sua senha" />
+
+    <label for="turma">Turma</label>
+    <input type="text" id="turma" placeholder="Ex: 3A, 2B, Info-1..." />
+
+    <div class="checkbox-area">
+      <input type="checkbox" id="termos" />
+      <label for="termos">Aceito os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></label>
+    </div>
+
+    <button id="btnCriar">Criar conta</button>
+  </div>
+
+</body>
+</html>
