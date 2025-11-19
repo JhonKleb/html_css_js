@@ -164,6 +164,62 @@
 
     <button id="btnCriar">Criar conta</button>
   </div>
+<script>
+  document.getElementById("btnCriar").addEventListener("click", async () => {
+    const matricula = document.getElementById("matricula").value.trim();
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+    const turma = document.getElementById("turma").value.trim();
+    const termos = document.getElementById("termos").checked;
 
+    // ⚠️ Verificação de campos obrigatórios
+    if (!matricula || !nome || !email || !senha) {
+      alert("Preencha todos os campos obrigatórios!");
+      return;
+    }
+
+    if (!termos) {
+      alert("Você deve aceitar os Termos de Uso para continuar.");
+      return;
+    }
+
+    // 📦 Montagem do JSON conforme API
+    const dados = {
+      matricula: parseInt(matricula),
+      nome: nome,
+      email: email,
+      senha: senha,
+    };
+
+    // Se tiver turma, envia como aluno
+    if (turma !== "") {
+      dados.turma = turma;
+    }
+
+    try {
+      const resposta = await fetch("http://localhost:5000/cadastro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dados),
+      });
+
+      const resultado = await resposta.json();
+
+      if (resposta.status === 201) {
+        alert("Conta criada com sucesso! Matrícula: " + resultado.matricula);
+        window.location.href = "login.html"; // redirecionamento opcional
+      } else {
+        alert(resultado.message || "Erro ao criar conta.");
+      }
+
+    } catch (erro) {
+      console.error("Erro ao conectar com o servidor:", erro);
+      alert("Erro ao conectar com o servidor. Verifique se a API está rodando.");
+    }
+  });
+</script>
 </body>
 </html>
