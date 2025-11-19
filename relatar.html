@@ -1,36 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatar Problema - SIPAT-LJ</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIPAT-LJ - Relatar Problema</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0d1117, #1b1f27);
+      color: #fff;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #161b22;
+      padding: 14px 32px;
+      margin: 30px auto;
+      border-radius: 50px;
+      max-width: 960px;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      border: 1px solid #00ff88;
+    }
+
+    .pill-navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00ff88;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      padding: 8px 20px;
+      text-decoration: none;
+      font-weight: 500;
+      background-color: #1f2630;
+      color: #ccc;
+      border-radius: 30px;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background-color: #00ff88;
+      color: #000;
+    }
+
+    .profile-pic {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: none;
+      display: block;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .profile-pic:hover {
+      transform: scale(1.05);
+    }
+
+    .section {
+      padding: 40px;
+      background: #10141c;
+      margin: 20px auto;
+      border-radius: 16px;
+      border: 1px solid rgba(0,255,136,0.25);
+      box-shadow: 0 0 25px rgba(0,255,136,0.12);
+      max-width: 1200px;
+      width: 90%;
+      animation: appear 0.6s cubic-bezier(0.3,0,0.3,1);
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section h2 {
+      color: #00ff88;
+      margin-bottom: 20px;
+    }
+
+    form input, form textarea, form select, form button {
+      display: block;
+      width: 100%;
+      margin: 12px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #1f2230;
+      color: #fff;
+      transition: 0.25s ease;
+    }
+
+    form input:focus,
+    form textarea:focus,
+    form select:focus {
+      outline: none;
+      box-shadow: 0 0 12px rgba(0,255,136,0.35);
+      border: 1px solid #00ff88;
+      transform: scale(1.02);
+    }
+
+    form button {
+      background: #00ff88;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    form button:hover {
+      background-color: #00cc6a;
+      transform: translateY(-2px);
+      box-shadow: 0 0 12px rgba(0,255,136,0.35);
+    }
+  </style>
 </head>
-<body onload="verificarLogin()">
-  <header>
+
+<body>
+
+  <header class="pill-navbar">
     <div class="logo">SIPAT-LJ</div>
-    <nav>
+    <nav class="nav-links">
       <a href="index.html">Início</a>
       <a href="equipamentos.html">Equipamentos</a>
-      <a href="relatar.html" class="active">Relatar</a>
-      <a href="#" onclick="logout()">Sair</a>
+      <a class="active">Relatar</a>
+      <a href="confi.html">
+        <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
+      </a>
     </nav>
   </header>
 
-  <section class="section">
+  <section class="section" id="relato">
     <h2>Relatar Problema</h2>
 
-    <form onsubmit="enviarRelato(event)">
-      <input id="tombo" type="text" placeholder="Identificação do Equipamento (Tombo)" required>
-      <input id="matricula" type="text" placeholder="Sua Matrícula" required>
-      <input id="localizacao" type="text" placeholder="Localização do Equipamento" required>
+    <form id="relatoForm">
+      <input id="tombo" type="text" placeholder="Número de tombamento" required />
+      <input id="matricula" type="text" placeholder="Sua matrícula" required />
       <textarea id="descricao" placeholder="Descreva o problema" required></textarea>
-
+      <select id="setorSelect" required>
+        <option value="">Selecione o setor</option>
+      </select>
       <button type="submit">Enviar Relato</button>
     </form>
-
   </section>
-  <script src="./js/script.js"></script>
+
+  <script>
+    const navFoto = document.getElementById("navFoto");
+    const fotoSalva = localStorage.getItem("fotoPerfil");
+    if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
+
+    const setorSelect = document.getElementById("setorSelect");
+    let setores = JSON.parse(localStorage.getItem("setores")) || [];
+
+    function preencherSetores() {
+      setorSelect.innerHTML = '<option value="">Selecione o setor</option>';
+      setores.forEach(s => {
+        setorSelect.innerHTML += `<option value="${s}">${s}</option>`;
+      });
+    }
+    preencherSetores();
+
+    document.getElementById("relatoForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const tombo = document.getElementById("tombo").value;
+      const matricula = document.getElementById("matricula").value;
+      const descricao = document.getElementById("descricao").value;
+      const setor = setorSelect.value;
+
+      if (!setor) return alert("Selecione um setor válido.");
+
+      alert(
+        "Relato enviado!\n\n" +
+        "Tombamento: " + tombo + "\n" +
+        "Matrícula: " + matricula + "\n" +
+        "Descrição: " + descricao + "\n" +
+        "Setor: " + setor
+      );
+
+      this.reset();
+    });
+  </script>
 
 </body>
 </html>
