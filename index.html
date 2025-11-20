@@ -13,7 +13,6 @@ body {
   background: linear-gradient(135deg, #0d1117, #1b1f27);
   color: #fff;
 }
-
 header {
   display: flex;
   justify-content: space-between;
@@ -26,19 +25,16 @@ header {
   box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
   border: 1px solid #00ff88;
 }
-
 .pill-navbar .logo {
   font-size: 1.5rem;
   font-weight: bold;
   color: #00ff88;
 }
-
 .nav-links {
   display: flex;
   gap: 12px;
   align-items: center;
 }
-
 .nav-links a {
   padding: 8px 20px;
   text-decoration: none;
@@ -48,13 +44,11 @@ header {
   border-radius: 30px;
   transition: 0.3s;
 }
-
 .nav-links a:hover,
 .nav-links a.active {
   background-color: #00ff88;
   color: #000;
 }
-
 .profile-pic {
   width: 42px;
   height: 42px;
@@ -65,11 +59,9 @@ header {
   cursor: pointer;
   transition: .2s;
 }
-
 .profile-pic:hover {
   transform: scale(1.05);
 }
-
 .hero {
   display: flex;
   justify-content: center;
@@ -80,24 +72,20 @@ header {
   max-width: 960px;
   margin: 0 auto 40px auto;
 }
-
 .hero-text {
   max-width: 500px;
 }
-
 .hero-text h1 {
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-transform: uppercase;
 }
-
 .hero-text p {
   color: #aaa;
   font-size: 1rem;
   margin-bottom: 30px;
   line-height: 1.5;
 }
-
 .hero-text button {
   background: #00ff88;
   border: none;
@@ -108,24 +96,20 @@ header {
   cursor: pointer;
   transition: 0.3s;
 }
-
 .hero-text button:hover {
   background: #00cc6a;
 }
-
 .hero-img {
   flex: 1 1 400px;
   display: flex;
   justify-content: center;
 }
-
 .hero-img img {
   width: 100%;
   max-width: 700px;
   height: auto;
   object-fit: contain;
 }
-
 .section {
   padding: 40px;
   background: #10141c;
@@ -136,24 +120,20 @@ header {
   width: 90%;
   box-sizing: border-box;
 }
-
 .section h2 {
   color: #00ff88;
   margin-bottom: 20px;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
 }
-
 th,
 td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #333;
 }
-
 th {
   background-color: #1a1d2e;
   color: #00ff88;
@@ -185,7 +165,6 @@ th {
   </div>
 </section>
 
-<!-- 🔥 AQUI substituí SOMENTE o conteúdo – mantendo o design -->
 <section id="equipamentos" class="section">
   <h2>Histórico de Relatos</h2>
 
@@ -202,7 +181,7 @@ th {
     </thead>
     <tbody id="historicoBody">
       <tr>
-        <td colspan="6">Carregando histórico...</td>
+        <td colspan="6" style="text-align:center;">Carregando histórico...</td>
       </tr>
     </tbody>
   </table>
@@ -236,46 +215,61 @@ if (tipo === "servidor") {
   `;
 }
 
-
-// --------- HISTÓRICO DO USUÁRIO ---------
-async function carregarHistorico() {
-  const matricula = localStorage.getItem("matricula");
-
-  try {
-    const response = await fetch(`${API_URL}/denuncias`);
-    const data = await response.json();
-
-    const denuncias = data["Todas as denúncias"].filter(
-      d => d.matricula_al == matricula
-    );
-
-    const tbody = document.getElementById("historicoBody");
-
-    if (denuncias.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6">Você ainda não enviou nenhum relato.</td></tr>`;
-      return;
+document.addEventListener("DOMContentLoaded", async () => {
+    const userData = localStorage.getItem("usuarioLogado");
+    if (!userData) {
+        window.location.href = "login.html";
+        return;
     }
 
-    tbody.innerHTML = denuncias
-      .map(d => `
-        <tr>
-          <td>${d.id_denuncia}</td>
-          <td>${d.tombo}</td>
-          <td>${d.descricao}</td>
-          <td>${d.setor || "-"}</td>
-          <td>${d.status}</td>
-          <td>${new Date(d.data_denuncia).toLocaleString("pt-BR")}</td>
-        </tr>
-      `)
-      .join("");
+    const user = JSON.parse(userData);
+    const matricula = user.matricula;
 
-  } catch (err) {
-    document.getElementById("historicoBody").innerHTML =
-      `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
-  }
-}
+    if (!matricula) {
+        alert("Erro: matrícula não encontrada.");
+        return;
+    }
 
-carregarHistorico();
+    const tableBody = document.getElementById("historicoBody");
+
+    try {
+        const response = await fetch(`${API_URL}/denuncias_usuario/${matricula}`);
+        const data = await response.json();
+
+        tableBody.innerHTML = "";
+
+        if (!data.denuncias || data.denuncias.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;">Nenhum relato encontrado</td>
+                </tr>
+            `;
+            return;
+        }
+
+        data.denuncias.forEach(denuncia => {
+            const linha = `
+                <tr>
+                    <td>${denuncia.id_denuncia || "-"}</td>
+                    <td>${denuncia.tombo || "-"}</td>
+                    <td>${denuncia.descricao || "-"}</td>
+                    <td>${denuncia.setor || "-"}</td>
+                    <td>${denuncia.status || "-"}</td>
+                    <td>${denuncia.data_denuncia || "-"}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += linha;
+        });
+
+    } catch (err) {
+        console.error("Erro ao carregar dados:", err);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;">Erro ao carregar dados.</td>
+            </tr>
+        `;
+    }
+});
 </script>
 
 </body>
