@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";  // usa localhost como você pediu
+const API_URL = "http://localhost:5000";
 
 async function login(event) {
     event.preventDefault();
@@ -24,11 +24,12 @@ async function login(event) {
         const data = await response.json();
 
         if (response.ok) {
+
             localStorage.setItem("usuarioLogado", JSON.stringify(data));
+            localStorage.setItem("matriculaLogada", data.matricula);
+            localStorage.setItem("tipoUsuario", data.tipo);
 
             alert("Login realizado com sucesso!");
-
-            // Redireciona para a página inicial
             window.location.href = "index.html";
 
         } else {
@@ -38,18 +39,46 @@ async function login(event) {
     } catch (error) {
         console.error("Erro no login:", error);
         alert("Erro ao conectar-se ao servidor.");
-
-    if (response.ok) {
-    localStorage.setItem("usuarioLogado", JSON.stringify(data));
-    localStorage.setItem("matriculaLogada", data.matricula);
-
-    alert("Login realizado com sucesso!");
-    window.location.href = "index.html";
-}
-
     }
 }
 
+function configurarInterfaceUsuario() {
+
+    const tipo = localStorage.getItem("tipoUsuario");
+
+    const btnAdmin = document.getElementById("btn-admin");
+    const linkEquip = document.getElementById("nav-equip");
+    const linkRelatar = document.getElementById("nav-relatar");
+
+    if (!tipo) return;
+
+    if (tipo === "servidor") {
+
+        // Servidor vê tudo
+        if (btnAdmin) btnAdmin.style.display = "inline-block";
+        if (linkEquip) linkEquip.style.display = "inline-block";
+        if (linkRelatar) linkRelatar.style.display = "inline-block";
+
+    } else {
+
+        // Aluno → limita
+        if (btnAdmin) btnAdmin.style.display = "none";
+        if (linkEquip) linkEquip.style.display = "none"; 
+
+        // Relatar permanece visível
+        if (linkRelatar) linkRelatar.style.display = "inline-block";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", configurarInterfaceUsuario);
+
+if (window.location.pathname.includes("admin.html")) {
+    const tipo = localStorage.getItem("tipoUsuario");
+    if (tipo !== "servidor") {
+        alert("Acesso permitido apenas para servidores!");
+        window.location.href = "index.html";
+    }
+}
 
 async function enviarRelato(event) {
     event.preventDefault();
@@ -72,11 +101,9 @@ async function enviarRelato(event) {
     };
 
     try {
-        const response = await fetch("http://localhost:5000/insobj", {
+        const response = await fetch(`${API_URL}/insobj`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(denunciaData)
         });
 
