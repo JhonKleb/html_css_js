@@ -24,9 +24,13 @@ async function login(event) {
         const data = await response.json();
 
         if (response.ok) {
+            localStorage.setItem("usuarioLogado", JSON.stringify(data));
+
             alert("Login realizado com sucesso!");
-            localStorage.setItem("matricula", matricula);
+
+            // Redireciona para a página inicial
             window.location.href = "index.html";
+
         } else {
             alert(data.message || "Matrícula ou senha incorretos!");
         }
@@ -34,8 +38,18 @@ async function login(event) {
     } catch (error) {
         console.error("Erro no login:", error);
         alert("Erro ao conectar-se ao servidor.");
+
+    if (response.ok) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(data));
+    localStorage.setItem("matriculaLogada", data.matricula);
+
+    alert("Login realizado com sucesso!");
+    window.location.href = "index.html";
+}
+
     }
 }
+
 
 async function enviarRelato(event) {
     event.preventDefault();
