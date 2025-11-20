@@ -72,10 +72,10 @@ header {
 
 .hero {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   padding: 60px 40px;
-  gap: 30px; 
+  gap: 30px;
   flex-wrap: wrap;
   max-width: 960px;
   margin: 0 auto 40px auto;
@@ -114,16 +114,16 @@ header {
 }
 
 .hero-img {
-  flex: 1 1 400px;       
+  flex: 1 1 400px;
   display: flex;
-  justify-content: center; 
+  justify-content: center;
 }
 
 .hero-img img {
   width: 100%;
-  max-width: 700px;     
+  max-width: 700px;
   height: auto;
-  object-fit: contain;    
+  object-fit: contain;
 }
 
 .section {
@@ -165,11 +165,7 @@ th {
 
 <header class="pill-navbar">
   <div class="logo">SIPAT-LJ</div>
-  <nav class="nav-links" id="navLinks">
-    <!-- CONTEÚDO SERÁ INSERIDO DINAMICAMENTE →
-         aluno = menu reduzido
-         servidor = menu completo -->
-  </nav>
+  <nav class="nav-links" id="navLinks"></nav>
 </header>
 
 <section class="hero">
@@ -189,70 +185,97 @@ th {
   </div>
 </section>
 
+<!-- 🔥 AQUI substituí SOMENTE o conteúdo – mantendo o design -->
 <section id="equipamentos" class="section">
-  <h2>Equipamentos por Setor</h2>
+  <h2>Histórico de Relatos</h2>
+
   <table>
     <thead>
       <tr>
+        <th>ID</th>
+        <th>Tombo</th>
+        <th>Descrição</th>
         <th>Setor</th>
-        <th>Equipamento</th>
         <th>Status</th>
+        <th>Data</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="historicoBody">
       <tr>
-        <td>Laboratório de Informática 1</td>
-        <td>Computador 01</td>
-        <td>Funcionando</td>
-      </tr>
-      <tr>
-        <td>Laboratório de Física</td>
-        <td>Projetor</td>
-        <td>Com problema</td>
-      </tr>
-      <tr>
-        <td>Biblioteca</td>
-        <td>Scanner</td>
-        <td>Funcionando</td>
+        <td colspan="6">Carregando histórico...</td>
       </tr>
     </tbody>
   </table>
 </section>
 
 <script>
-// ---------- FOTO DE PERFIL ----------
-const navFoto = document.getElementById("navFoto");
-const fotoSalva = localStorage.getItem("fotoPerfil");
+const API_URL = "http://localhost:5000";
 
-if (navFoto) {
-  navFoto.src = fotoSalva || "perfil_padrao.png";
-}
-
-// ---------- MENU DINÂMICO ----------
+// --------- MENU DINÂMICO ---------
 const tipo = localStorage.getItem("tipoUsuario");
 const nav = document.getElementById("navLinks");
+const fotoSalva = localStorage.getItem("fotoPerfil");
 
 if (tipo === "servidor") {
-  // MENU COMPLETO
   nav.innerHTML = `
     <a href="#" class="active">Início</a>
     <a href="equipamentos.html">Equipamentos</a>
     <a href="relatar.html">Relatar</a>
     <a href="admin.html">Admin</a>
     <a href="confi.html">
-      <img id="navFoto" src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+      <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
     </a>
   `;
 } else {
-  // MENU RESTRITO PARA ALUNO
   nav.innerHTML = `
     <a href="#" class="active">Início</a>
     <a href="relatar.html">Relatar</a>
     <a href="confi.html">
-      <img id="navFoto" src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+      <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
     </a>
   `;
 }
+
+
+// --------- HISTÓRICO DO USUÁRIO ---------
+async function carregarHistorico() {
+  const matricula = localStorage.getItem("matricula");
+
+  try {
+    const response = await fetch(`${API_URL}/denuncias`);
+    const data = await response.json();
+
+    const denuncias = data["Todas as denúncias"].filter(
+      d => d.matricula_al == matricula
+    );
+
+    const tbody = document.getElementById("historicoBody");
+
+    if (denuncias.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6">Você ainda não enviou nenhum relato.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = denuncias
+      .map(d => `
+        <tr>
+          <td>${d.id_denuncia}</td>
+          <td>${d.tombo}</td>
+          <td>${d.descricao}</td>
+          <td>${d.setor || "-"}</td>
+          <td>${d.status}</td>
+          <td>${new Date(d.data_denuncia).toLocaleString("pt-BR")}</td>
+        </tr>
+      `)
+      .join("");
+
+  } catch (err) {
+    document.getElementById("historicoBody").innerHTML =
+      `<tr><td colspan="6">Erro ao carregar dados.</td></tr>`;
+  }
+}
+
+carregarHistorico();
 </script>
 
 </body>
