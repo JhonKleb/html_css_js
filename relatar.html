@@ -68,7 +68,6 @@
       border-radius: 50%;
       object-fit: cover;
       border: none;
-      display: block;
       cursor: pointer;
       transition: .2s;
     }
@@ -126,7 +125,6 @@
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 12px;
     }
 
     form button:hover {
@@ -143,7 +141,6 @@
     <div class="logo">SIPAT-LJ</div>
     <nav class="nav-links">
       <a href="index.html">Início</a>
-      <!-- Removido Equipamentos -->
       <a class="active">Relatar</a>
       <a href="confi.html">
         <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
@@ -158,47 +155,85 @@
       <input id="tombo" type="text" placeholder="Número de tombamento" required />
       <input id="matricula" type="text" placeholder="Sua matrícula" required />
       <textarea id="descricao" placeholder="Descreva o problema" required></textarea>
+
       <select id="setorSelect" required>
         <option value="">Selecione o setor</option>
       </select>
+
       <button type="submit">Enviar Relato</button>
     </form>
   </section>
 
   <script>
+    const API_URL = "http://localhost:5000";
+
+    // FOTO DE PERFIL
     const navFoto = document.getElementById("navFoto");
     const fotoSalva = localStorage.getItem("fotoPerfil");
     if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
 
-    const setorSelect = document.getElementById("setorSelect");
-    let setores = JSON.parse(localStorage.getItem("setores")) || [];
+    // CARREGAR SETORES DA API
+    async function carregarSetores() {
+      try {
+        const response = await fetch(`${API_URL}/setores`);
+        if (!response.ok) {
+          throw new Error("Erro ao carregar setores");
+        }
 
-    function preencherSetores() {
-      setorSelect.innerHTML = '<option value="">Selecione o setor</option>';
-      setores.forEach(s => {
-        setorSelect.innerHTML += `<option value="${s}">${s}</option>`;
-      });
+        const data = await response.json();
+        const setores = data["Setores"];
+        const setorSelect = document.getElementById("setorSelect");
+
+        setorSelect.innerHTML = '<option value="">Selecione o setor</option>';
+
+        setores.forEach(s => {
+          setorSelect.innerHTML += `<option value="${s.nome_setor}">${s.nome_setor}</option>`;
+        });
+
+      } catch (error) {
+        alert("Erro ao carregar setores da API.");
+      }
     }
-    preencherSetores();
+    carregarSetores();
 
-    document.getElementById("relatoForm").addEventListener("submit", function(event) {
+    // ENVIAR RELATO PARA A API
+    document.getElementById("relatoForm").addEventListener("submit", async function(event) {
       event.preventDefault();
+
       const tombo = document.getElementById("tombo").value;
       const matricula = document.getElementById("matricula").value;
       const descricao = document.getElementById("descricao").value;
-      const setor = setorSelect.value;
+      const setor = document.getElementById("setorSelect").value;
 
       if (!setor) return alert("Selecione um setor válido.");
 
-      alert(
-        "Relato enviado!\n\n" +
-        "Tombamento: " + tombo + "\n" +
-        "Matrícula: " + matricula + "\n" +
-        "Descrição: " + descricao + "\n" +
-        "Setor: " + setor
-      );
+      const payload = {
+        Tombo: tombo,
+        Matrícula: matricula,
+        Descrição: descricao,
+        Setor: setor
+      };
 
-      this.reset();
+      try {
+        const response = await fetch(`${API_URL}/insobj`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert(result.message || "Erro ao enviar relato.");
+          return;
+        }
+
+        alert("Relato enviado com sucesso!");
+        this.reset();
+
+      } catch (err) {
+        alert("Falha ao conectar à API.");
+      }
     });
   </script>
 
