@@ -162,46 +162,47 @@
   <script>
     document.getElementById("btnMostrar").addEventListener("click", carregarDenuncias);
 
-    function carregarDenuncias() {
-  fetch("http://127.0.0.1:5000/denuncias")
-    .then(response => response.json())
-    .then(data => {
-      const lista = data["Todas as denúncias"]; // 🔥 AQUI ESTAVA O ERRO
+  function carregarDenuncias() {
+    fetch("http://127.0.0.1:5000/denuncias")
+      .then(response => response.json())
+      .then(data => {
 
-      if (!Array.isArray(lista)) {
-        alert("Erro: resposta inesperada da API.");
-        console.log(data);
-        return;
-      }
+        // 🔥 Correção aplicada aqui
+        if (!data["Todas as denúncias"]) {
+          alert("Nenhuma denúncia encontrada!");
+          return;
+        }
 
-      const tabela = document.getElementById("tabelaDenuncias");
-      const corpo = document.getElementById("corpoTabela");
+        const lista = data["Todas as denúncias"];
 
-      corpo.innerHTML = "";
+        const tabela = document.getElementById("tabelaDenuncias");
+        const corpo = document.getElementById("corpoTabela");
 
-      lista.forEach(d => {
-        const linha = document.createElement("tr");
+        corpo.innerHTML = "";
 
-        linha.innerHTML = `
-          <td>${d.id_denuncia}</td>
-          <td>${d.tombo ?? "-"}</td>
-          <td>${d.matricula_al}</td>
-          <td>${d.descricao}</td>
-          <td>${d.status}</td>
-          <td>${new Date(d.data_denuncia).toLocaleString()}</td>
-          <td>${d.setor ?? "-"}</td>
-        `;
+        lista.forEach(d => {
+          const linha = document.createElement("tr");
 
-        corpo.appendChild(linha);
+          linha.innerHTML = `
+            <td>${d.id_denuncia}</td>
+            <td>${d.tombo ?? "-"}</td>
+            <td>${d.matricula_al}</td>
+            <td>${d.descricao}</td>
+            <td>${d.status}</td>
+            <td>${new Date(d.data_denuncia).toLocaleString()}</td>
+            <td>${d.setor ?? "-"}</td>
+          `;
+
+          corpo.appendChild(linha);
+        });
+
+        tabela.style.display = "table";
+      })
+      .catch(error => {
+        alert("Erro ao carregar denúncias: " + error);
+        console.error(error);
       });
-
-      tabela.style.display = "table";
-    })
-    .catch(error => {
-      alert("Erro ao carregar denúncias: " + error);
-      console.error(error);
-    });
-}
+  }
   </script>
 
 </body>
