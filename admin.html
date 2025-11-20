@@ -127,15 +127,33 @@
 
 <body>
 
+  <script>
+    // 🔥 BLOQUEIO: somente servidor pode acessar admin
+    const tipo = localStorage.getItem("tipoUsuario");
+
+    if (tipo !== "servidor") {
+      alert("Acesso permitido apenas para servidores!");
+      window.location.href = "index.html";
+    }
+  </script>
+
   <header class="pill-navbar">
     <div class="logo">SIPAT-LJ</div>
     <nav class="nav-links">
       <a href="index.html">Início</a>
-      <a href="equipamentos.html">Equipamentos</a>
+      <a href="equipamentos.html" id="btnEquip">Equipamentos</a>
       <a href="relatar.html">Relatar</a>
-      <a href="admin.html" class="active">Admin</a>
+      <a href="admin.html" class="active" id="btnAdmin">Admin</a>
     </nav>
   </header>
+
+  <script>
+    // 🔥 remove botões caso não seja servidor (por segurança extra)
+    if (localStorage.getItem("tipoUsuario") !== "servidor") {
+        document.getElementById("btnEquip")?.remove();
+        document.getElementById("btnAdmin")?.remove();
+    }
+  </script>
 
   <section class="section">
     <h2>Painel do Administrador</h2>
@@ -167,7 +185,6 @@
       .then(response => response.json())
       .then(data => {
 
-        // 🔥 Correção aplicada aqui
         if (!data["Todas as denúncias"]) {
           alert("Nenhuma denúncia encontrada!");
           return;
