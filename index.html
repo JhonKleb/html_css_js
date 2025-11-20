@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SIPAT-LJ - Início</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-<style>
 
+<style>
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -113,7 +113,6 @@ header {
   background: #00cc6a;
 }
 
-
 .hero-img {
   flex: 1 1 400px;       
   display: flex;
@@ -160,18 +159,16 @@ th {
   color: #00ff88;
 }
 </style>
+</head>
 
 <body>
 
 <header class="pill-navbar">
   <div class="logo">SIPAT-LJ</div>
-  <nav class="nav-links">
-    <a href="#" class="active">Início</a>
-    <a href="equipamentos.html">Equipamentos</a>
-    <a href="relatar.html">Relatar</a>
-    <a href="confi.html" onclick="localStorage.setItem('paginaOrigem','professor')">
-      <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
-    </a>
+  <nav class="nav-links" id="navLinks">
+    <!-- CONTEÚDO SERÁ INSERIDO DINAMICAMENTE →
+         aluno = menu reduzido
+         servidor = menu completo -->
   </nav>
 </header>
 
@@ -223,16 +220,39 @@ th {
 </section>
 
 <script>
-  const navFoto = document.getElementById("navFoto");
-  const fotoSalva = localStorage.getItem("fotoPerfil");
+// ---------- FOTO DE PERFIL ----------
+const navFoto = document.getElementById("navFoto");
+const fotoSalva = localStorage.getItem("fotoPerfil");
 
-  if (navFoto) {
-    if (fotoSalva) {
-      navFoto.src = fotoSalva;
-    } else {
-      navFoto.src = "perfil_padrao.png";
-    }
-  }
+if (navFoto) {
+  navFoto.src = fotoSalva || "perfil_padrao.png";
+}
+
+// ---------- MENU DINÂMICO ----------
+const tipo = localStorage.getItem("tipoUsuario");
+const nav = document.getElementById("navLinks");
+
+if (tipo === "servidor") {
+  // MENU COMPLETO
+  nav.innerHTML = `
+    <a href="#" class="active">Início</a>
+    <a href="equipamentos.html">Equipamentos</a>
+    <a href="relatar.html">Relatar</a>
+    <a href="admin.html">Admin</a>
+    <a href="confi.html">
+      <img id="navFoto" src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+    </a>
+  `;
+} else {
+  // MENU RESTRITO PARA ALUNO
+  nav.innerHTML = `
+    <a href="#" class="active">Início</a>
+    <a href="relatar.html">Relatar</a>
+    <a href="confi.html">
+      <img id="navFoto" src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+    </a>
+  `;
+}
 </script>
 
 </body>
