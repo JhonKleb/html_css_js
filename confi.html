@@ -127,19 +127,19 @@
 
   <div class="perfil-area">
     <img class="foto-perfil" id="fotoConfig" src="./perfil_padrao.png" alt="perfil">
-    <div class="perfil-nome" id="nomeConfig">ARRUDA</div>
+    <div class="perfil-nome" id="nomeConfig">Carregando...</div>
     <div class="perfil-lang">Português</div>
   </div>
 
   <div class="left-side">
     <div class="titulo">CONFIGURAÇÃO</div>
-    <div class="subtitulo">Conta: Servidor</div>
+    <div class="subtitulo" id="tipoConta">Conta: ---</div>
 
     <div class="label">MATRÍCULA:</div>
-    <div class="valor">2023120230019</div>
+    <div class="valor" id="matConfig">---</div>
 
     <div class="label">EMAIL DA CONTA:</div>
-    <div class="valor">arrudathiago234@gmail.com</div>
+    <div class="valor" id="emailConfig">---</div>
 
     <div class="label" style="margin-top: 40px;"> 
       <a href="termos.html" target="_blank" style="color:#00ff88; text-decoration:underline;">
@@ -160,27 +160,49 @@
 </div>
 
 <script>
-  const fotoSalva = localStorage.getItem("fotoPerfil");
-  const nomeSalvo = localStorage.getItem("nomeUsuario"); 
+async function carregarDadosUsuario() {
+  const matricula = localStorage.getItem("matriculaLogada");
+  const tipo = localStorage.getItem("tipoUsuario");
 
-  if (fotoSalva) {
-    document.getElementById("fotoConfig").src = fotoSalva;
+  if (!matricula) {
+    alert("Nenhum usuário logado!");
+    window.location.href = "login.html";
+    return;
   }
 
-  if (nomeSalvo) {
-    document.getElementById("nomeConfig").textContent = nomeSalvo;
+  try {
+    const resposta = await fetch(`http://localhost:5000/dadosusuario/${matricula}`);
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      alert("Erro ao carregar dados.");
+      return;
+    }
+
+    document.getElementById("nomeConfig").textContent = dados.nome;
+    document.getElementById("emailConfig").textContent = dados.email;
+    document.getElementById("matConfig").textContent = dados.matricula;
+
+    document.getElementById("tipoConta").textContent =
+      "Conta: " + (tipo === "aluno" ? "Aluno" : "Servidor");
+
+  } catch (erro) {
+    console.error("Erro:", erro);
   }
+}
 
-  const botaoVoltar = document.getElementById("btnVoltar");
-  const origem = localStorage.getItem("paginaOrigem");
+carregarDadosUsuario();
 
-  if(origem === "aluno") {
-    botaoVoltar.href = "index.aluno.html";
-  } else {
-    botaoVoltar.href = "index.html";
-  }
+const botaoVoltar = document.getElementById("btnVoltar");
+const origem = localStorage.getItem("paginaOrigem");
 
-  localStorage.removeItem("paginaOrigem");
+if (origem === "aluno") {
+  botaoVoltar.href = "index.aluno.html";
+} else {
+  botaoVoltar.href = "index.html";
+}
+
+localStorage.removeItem("paginaOrigem");
 </script>
 
 </body>
