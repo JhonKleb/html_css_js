@@ -54,7 +54,6 @@ function configurarInterfaceUsuario() {
 
     if (tipo === "servidor") {
 
-        // Servidor vê tudo
         if (btnAdmin) btnAdmin.style.display = "inline-block";
         if (linkEquip) linkEquip.style.display = "inline-block";
         if (linkRelatar) linkRelatar.style.display = "inline-block";
