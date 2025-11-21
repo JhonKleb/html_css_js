@@ -13,14 +13,7 @@
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #0d1117, #1b1f27);
       color: #fff;
-      animation: fadeIn 0.6s ease-out;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     header {
       display: flex;
       justify-content: space-between;
@@ -33,48 +26,12 @@
       box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
       border: 1px solid #00ff88;
     }
-
-    .pill-navbar .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #00ff88;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .nav-links a {
-      padding: 8px 20px;
-      text-decoration: none;
-      font-weight: 500;
-      background-color: #1f2630;
-      color: #ccc;
-      border-radius: 30px;
-      transition: 0.3s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      background-color: #00ff88;
-      color: #000;
-    }
-
-    .profile-pic {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: none;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .profile-pic:hover {
-      transform: scale(1.05);
-    }
+    .pill-navbar .logo { font-size: 1.5rem; font-weight: bold; color: #00ff88; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-links a { padding: 8px 20px; text-decoration: none; font-weight: 500; background-color: #1f2630; color: #ccc; border-radius: 30px; transition: 0.3s; }
+    .nav-links a:hover, .nav-links a.active { background-color: #00ff88; color: #000; }
+    .profile-pic { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: none; cursor: pointer; transition: .2s; }
+    .profile-pic:hover { transform: scale(1.05); }
 
     .section {
       padding: 40px;
@@ -85,18 +42,9 @@
       box-shadow: 0 0 25px rgba(0,255,136,0.12);
       max-width: 1200px;
       width: 90%;
-      animation: appear 0.6s cubic-bezier(0.3,0,0.3,1);
     }
 
-    @keyframes appear {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .section h2 {
-      color: #00ff88;
-      margin-bottom: 20px;
-    }
+    .section h2 { color: #00ff88; margin-bottom: 20px; }
 
     form input, form textarea, form select, form button {
       display: block;
@@ -110,23 +58,18 @@
       color: #fff;
       transition: 0.25s ease;
     }
-
-    form input:focus,
-    form textarea:focus,
-    form select:focus {
+    form input:focus, form textarea:focus, form select:focus {
       outline: none;
       box-shadow: 0 0 12px rgba(0,255,136,0.35);
       border: 1px solid #00ff88;
       transform: scale(1.02);
     }
-
     form button {
       background: #00ff88;
       color: #000;
       font-weight: bold;
       cursor: pointer;
     }
-
     form button:hover {
       background-color: #00cc6a;
       transform: translateY(-2px);
@@ -137,105 +80,93 @@
 
 <body>
 
-  <header class="pill-navbar">
-    <div class="logo">SIPAT-LJ</div>
-    <nav class="nav-links">
-      <a href="index.html">Início</a>
-      <a class="active">Relatar</a>
-      <a href="confi.html">
-        <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
-      </a>
-    </nav>
-  </header>
+<header class="pill-navbar">
+  <div class="logo">SIPAT-LJ</div>
+  <nav class="nav-links" id="navLinks"></nav>
+</header>
 
-  <section class="section" id="relato">
-    <h2>Relatar Problema</h2>
+<section class="section" id="relato">
+  <h2>Relatar Problema</h2>
 
-    <form id="relatoForm">
-      <input id="tombo" type="text" placeholder="Número de tombamento" required />
-      <input id="matricula" type="text" placeholder="Sua matrícula" required />
-      <textarea id="descricao" placeholder="Descreva o problema" required></textarea>
+  <form id="relatoForm">
+    <input id="tombo" type="text" placeholder="Número de tombamento" required />
+    <input id="matricula" type="text" placeholder="Sua matrícula" required />
+    <textarea id="descricao" placeholder="Descreva o problema" required></textarea>
 
-      <select id="setorSelect" required>
-        <option value="">Selecione o setor</option>
-      </select>
+    <select id="setorSelect" required>
+      <option value="">Selecione o setor</option>
+    </select>
 
-      <button type="submit">Enviar Relato</button>
-    </form>
-  </section>
+    <button type="submit">Enviar Relato</button>
+  </form>
+</section>
 
-  <script>
-    const API_URL = "http://localhost:5000";
+<script>
+const API_URL = "http://localhost:5000";
 
-    // FOTO DE PERFIL
-    const navFoto = document.getElementById("navFoto");
-    const fotoSalva = localStorage.getItem("fotoPerfil");
-    if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
+// ----- HEADER DINÂMICO -----
+const tipo = localStorage.getItem("tipoUsuario"); // 'aluno' ou 'servidor'
+const nav = document.getElementById("navLinks");
+const fotoSalva = localStorage.getItem("fotoPerfil");
 
-    // CARREGAR SETORES DA API
-    async function carregarSetores() {
-      try {
-        const response = await fetch(`${API_URL}/setores`);
-        if (!response.ok) {
-          throw new Error("Erro ao carregar setores");
-        }
+if (tipo === "servidor") {
+  nav.innerHTML = `
+    <a href="index.html" class="active">Início</a>
+    <a href="equipamentos.html">Equipamentos</a>
+    <a href="relatar.html">Relatar</a>
+    <a href="admin.html">Denúncias</a>
+    <a href="confi.html">
+      <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+    </a>
+  `;
+} else {
+  nav.innerHTML = `
+    <a href="index.html" class="active">Início</a>
+    <a href="relatar.html">Relatar</a>
+    <a href="confi.html">
+      <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+    </a>
+  `;
+}
 
-        const data = await response.json();
-        const setores = data["Setores"];
-        const setorSelect = document.getElementById("setorSelect");
+// ----- CARREGAR SETORES -----
+async function carregarSetores() {
+  try {
+    const res = await fetch(`${API_URL}/setores`);
+    if (!res.ok) throw new Error("Erro ao carregar setores");
 
-        setorSelect.innerHTML = '<option value="">Selecione o setor</option>';
+    const data = await res.json();
+    const select = document.getElementById("setorSelect");
+    select.innerHTML = '<option value="">Selecione o setor</option>';
+    data.Setores.forEach(s => select.innerHTML += `<option value="${s.nome_setor}">${s.nome_setor}</option>`);
+  } catch (err) {
+    alert("Erro ao carregar setores da API.");
+  }
+}
+carregarSetores();
 
-        setores.forEach(s => {
-          setorSelect.innerHTML += `<option value="${s.nome_setor}">${s.nome_setor}</option>`;
-        });
-
-      } catch (error) {
-        alert("Erro ao carregar setores da API.");
-      }
-    }
-    carregarSetores();
-
-    // ENVIAR RELATO PARA A API
-    document.getElementById("relatoForm").addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      const tombo = document.getElementById("tombo").value;
-      const matricula = document.getElementById("matricula").value;
-      const descricao = document.getElementById("descricao").value;
-      const setor = document.getElementById("setorSelect").value;
-
-      if (!setor) return alert("Selecione um setor válido.");
-
-      const payload = {
-        Tombo: tombo,
-        Matrícula: matricula,
-        Descrição: descricao,
-        Setor: setor
-      };
-
-      try {
-        const response = await fetch(`${API_URL}/insobj`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          alert(result.message || "Erro ao enviar relato.");
-          return;
-        }
-
-        alert("Relato enviado com sucesso!");
-        this.reset();
-
-      } catch (err) {
-        alert("Falha ao conectar à API.");
-      }
+// ----- ENVIAR RELATO -----
+document.getElementById("relatoForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const payload = {
+    Tombo: document.getElementById("tombo").value,
+    Matrícula: document.getElementById("matricula").value,
+    Descrição: document.getElementById("descricao").value,
+    Setor: document.getElementById("setorSelect").value
+  };
+  if (!payload.Setor) return alert("Selecione um setor válido.");
+  try {
+    const res = await fetch(`${API_URL}/insobj`, {
+      method:"POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
     });
-  </script>
+    const result = await res.json();
+    if(!res.ok) alert(result.message || "Erro ao enviar relato.");
+    else { alert("Relato enviado com sucesso!"); this.reset(); }
+  } catch(err) { alert("Falha ao conectar à API."); }
+});
+</script>
 
 </body>
 </html>
