@@ -174,10 +174,6 @@
     }
     th{color:var(--neon)}
 
-    .status-ok{color:var(--neon);font-weight:700}
-    .status-med{color:#e6d31e;font-weight:700}
-    .status-urg{color:#ff4444;font-weight:700}
-
     .btn-detalhar{
       background:var(--neon);
       color:#000;
@@ -233,299 +229,199 @@
 </head>
 
 <body>
-
   <header class="pill-navbar">
     <div class="logo">SIPAT-LJ</div>
-
-    <nav class="nav-links">
-      <a href="index.html">Início</a>
-      <a class="active">Equipamentos</a>
-      <a href="relatar.html">Relatar</a>
-
-      <a href="confi.html">
-        <img id="navFoto" src="" class="profile-pic" alt="Perfil" />
-      </a>
-    </nav>
+    <nav class="nav-links" id="navLinks"></nav>
   </header>
 
   <div class="container">
     <section class="section">
       <h2>Todos os Equipamentos por Setor</h2>
 
-      <div class="action-buttons">
+      <div class="action-buttons" id="actionButtons">
         <button id="btnAddEquip" class="btn-detalhar">Adicionar Equipamento</button>
         <button id="btnAddSetor" class="btn-detalhar">Adicionar Setor</button>
-        <button id="btnDelSetor" class="btn-detalhar" style="background:#ff4444;color:#fff;">Apagar Setor</button>
       </div>
 
       <div id="accordionContainer"></div>
     </section>
   </div>
 
-  <div class="modal-bg" id="modalBg">
+  <!-- Modal Adicionar Setor -->
+  <div class="modal-bg" id="modalSetor">
     <div class="modal">
-      <h3 id="modalTitle">Detalhes do Equipamento</h3>
-      <p id="md-tombo"></p>
-      <p id="md-matricula"></p>
-      <p id="md-desc"></p>
-      <p id="md-status"></p>
-      <p id="md-local"></p>
-      <p id="md-data"></p>
-      <button class="close" onclick="fecharModal()">Fechar</button>
+      <h3>Adicionar Setor</h3>
+      <input type="text" id="nomeSetorInput" placeholder="Nome do Setor" />
+      <button id="salvarSetor" class="btn-detalhar">Salvar</button>
+      <button class="close" onclick="closeModal('modalSetor')">Fechar</button>
     </div>
   </div>
 
-  <div class="modal-bg" id="modalAddSetor">
-    <div class="modal">
-      <h3>Adicionar Novo Setor</h3>
-      <input type="text" id="novoSetorNome" placeholder="Nome do setor">
-      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn-detalhar" onclick="adicionarSetor()">Adicionar</button>
-        <button class="close" onclick="fecharModalAddSetor()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-bg" id="modalDelSetor">
-    <div class="modal">
-      <h3>Apagar Setor</h3>
-      <select id="selecionarSetorDel"></select>
-      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
-        <button class="close" onclick="fecharModalDelSetor()">Cancelar</button>
-        <button class="btn-detalhar" style="background:#ff4444;color:#fff;" onclick="confirmarApagarSetor()">Apagar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-bg" id="modalAddEquip">
+  <!-- Modal Adicionar Equipamento -->
+  <div class="modal-bg" id="modalEquip">
     <div class="modal">
       <h3>Adicionar Equipamento</h3>
-      <input type="text" id="equipTombo" placeholder="Tombo do equipamento">
-      <input type="text" id="equipNome" placeholder="Nome/Descrição do equipamento">
-      <select id="equipSetor">
-        <option value="">Selecione o setor</option>
-      </select>
-      <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn-detalhar" onclick="adicionarEquipamento()">Adicionar</button>
-        <button class="close" onclick="fecharModalAddEquip()">Cancelar</button>
-      </div>
+      <input type="text" id="tomboInput" placeholder="Tombo" />
+      <input type="text" id="descricaoInput" placeholder="Descrição" />
+      <input type="text" id="setorInput" placeholder="Setor" />
+      <button id="salvarEquip" class="btn-detalhar">Salvar</button>
+      <button class="close" onclick="closeModal('modalEquip')">Fechar</button>
     </div>
   </div>
 
-<script>
+  <script>
+    const API_URL = "http://localhost:5000";
 
-const navFoto = document.getElementById("navFoto");
-const fotoSalva = localStorage.getItem("fotoPerfil");
-if (navFoto) navFoto.src = fotoSalva ? fotoSalva : "perfil_padrao.png";
+    // ----- HEADER DINÂMICO -----
+    const tipo = localStorage.getItem("tipoUsuario"); // 'aluno' ou 'servidor'
+    const nav = document.getElementById("navLinks");
+    const fotoSalva = localStorage.getItem("fotoPerfil");
 
-let equipamentos = JSON.parse(localStorage.getItem("equipamentos")) || [];
+    if (tipo === "servidor") {
+      nav.innerHTML = `
+        <a href="index.html">Início</a>
+        <a class="active">Equipamentos</a>
+        <a href="relatar.html">Relatar</a>
+        <a href="admin.html">Denúncias</a>
+        <a href="confi.html">
+          <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+        </a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Início</a>
+        <a class="active">Equipamentos</a>
+        <a href="relatar.html">Relatar</a>
+        <a href="confi.html">
+          <img src="${fotoSalva || 'perfil_padrao.png'}" class="profile-pic" alt="Perfil" />
+        </a>
+      `;
+    }
 
-function salvarSetores(){ localStorage.setItem("setores", JSON.stringify(setores)); }
-function salvarEquipamentos(){ localStorage.setItem("equipamentos", JSON.stringify(equipamentos)); }
+    async function fetchSetores() {
+      const res = await fetch(`${API_URL}/setores`);
+      const data = await res.json();
+      return data.Setores || [];
+    }
 
-const accordionContainer = document.getElementById("accordionContainer");
+    async function fetchPatrimonio() {
+      const res = await fetch(`${API_URL}/patrimonio`);
+      const data = await res.json();
+      return data.patrimonio_completo || [];
+    }
 
-function montarSetores(){
-  accordionContainer.innerHTML = "";
+    function createAccordionItem(setor, equipamentos) {
+      const item = document.createElement('div');
+      item.classList.add('accordion-item');
 
-  setores.forEach(setor => {
-    const bloco = document.createElement("div");
-    bloco.className = "accordion-item";
-    bloco.dataset.setor = setor;
+      const header = document.createElement('div');
+      header.classList.add('accordion-header');
+      header.textContent = setor.nome_setor;
 
-    bloco.innerHTML = `
-      <div class="accordion-header">
-        ${setor}
-      </div>
-      <div class="accordion-content">
-        <table>
-          <thead>
-            <tr>
-              <th>Tombo</th><th>Descrição</th><th>Status</th><th>Data</th><th>Detalhar</th><th>Excluir</th>
-            </tr>
-          </thead>
-          <tbody class="tbody-setor"></tbody>
-        </table>
-      </div>
-    `;
+      const content = document.createElement('div');
+      content.classList.add('accordion-content');
 
-    accordionContainer.appendChild(bloco);
-  });
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = `<tr>
+          <th>Tombo</th>
+          <th>Descrição</th>
+          <th>Situação</th>
+          <th>Local</th>
+        </tr>`;
+      table.appendChild(thead);
 
-  initAccordion();
-  preencherEquipamentos();
-  atualizarOpcoesSetor();
-  atualizarSelectDeleteSetor();
-}
-
-function initAccordion(){
-  const headers = document.querySelectorAll('.accordion-header');
-  headers.forEach(header=>{
-    header.onclick = (e)=>{
-      const isOpen = header.classList.contains("active");
-      headers.forEach(h=>{
-        h.classList.remove("active");
-        h.nextElementSibling.classList.remove("open");
+      const tbody = document.createElement('tbody');
+      equipamentos.forEach(eq => {
+        if(eq.setor === setor.nome_setor){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${eq.tombo}</td>
+                          <td>${eq.descricao}</td>
+                          <td>${eq.situacao}</td>
+                          <td>${eq.local}</td>`;
+          tbody.appendChild(tr);
+        }
       });
-      if(!isOpen){
-        header.classList.add("active");
-        header.nextElementSibling.classList.add("open");
+      table.appendChild(tbody);
+      content.appendChild(table);
+
+      header.addEventListener('click', () => {
+        header.classList.toggle('active');
+        content.classList.toggle('open');
+      });
+
+      item.appendChild(header);
+      item.appendChild(content);
+      return item;
+    }
+
+    async function loadAccordion() {
+      const container = document.getElementById('accordionContainer');
+      container.innerHTML = '';
+      const setores = await fetchSetores();
+      const patrimonio = await fetchPatrimonio();
+
+      setores.forEach(setor => {
+        const eqs = patrimonio.filter(p => p.setor === setor.nome_setor);
+        const item = createAccordionItem(setor, eqs);
+        container.appendChild(item);
+      });
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    document.getElementById('btnAddSetor').addEventListener('click', () => openModal('modalSetor'));
+    document.getElementById('btnAddEquip').addEventListener('click', () => openModal('modalEquip'));
+
+    document.getElementById('salvarSetor').addEventListener('click', async () => {
+      const nomeSetor = document.getElementById('nomeSetorInput').value.trim();
+      if(!nomeSetor) return alert("Digite o nome do setor!");
+      const res = await fetch(`${API_URL}/addsetor`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({Setor: nomeSetor})
+      });
+      if(res.ok){
+        alert("Setor adicionado com sucesso!");
+        closeModal('modalSetor');
+        loadAccordion();
+        document.getElementById('nomeSetorInput').value = '';
+      } else {
+        const err = await res.json();
+        alert(err.message || "Erro ao adicionar setor");
       }
-    };
-  });
-}
+    });
 
-function preencherEquipamentos(){
-  document.querySelectorAll(".tbody-setor").forEach(t=>t.innerHTML="");
+    document.getElementById('salvarEquip').addEventListener('click', async () => {
+      const tombo = document.getElementById('tomboInput').value.trim();
+      const descricao = document.getElementById('descricaoInput').value.trim();
+      const setor = document.getElementById('setorInput').value.trim();
 
-  equipamentos.forEach((item, index)=>{
-    const blocoSetor = document.querySelector(`[data-setor="${item.setor}"]`);
-    if (!blocoSetor) return;
+      if(!tombo || !descricao || !setor) return alert("Preencha todos os campos!");
+      const res = await fetch(`${API_URL}/insobj`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          Tombo: tombo,
+          Descrição: descricao,
+          Setor: setor
+        })
+      });
+      if(res.ok){
+        alert("Equipamento adicionado com sucesso!");
+        closeModal('modalEquip');
+        loadAccordion();
+        document.getElementById('tomboInput').value = '';
+        document.getElementById('descricaoInput').value = '';
+        document.getElementById('setorInput').value = '';
+      } else {
+        const err = await res.json();
+        alert(err.message || "Erro ao adicionar equipamento");
+      }
+    });
 
-    const tbody = blocoSetor.querySelector(".tbody-setor");
-
-    let cls = item.status==="Urgente" ? "status-urg" :
-              item.status==="Médio"   ? "status-med" :
-                                         "status-ok";
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${item.tombo}</td>
-        <td>${item.descricao}</td>
-        <td class="${cls}">${item.status}</td>
-        <td>${item.data}</td>
-        <td><button class="btn-detalhar" onclick='abrirModal(${JSON.stringify(item)})'>Detalhar</button></td>
-        <td><button style="background:#ff4444; color:#fff; padding:6px 10px; border-radius:8px; border:none; cursor:pointer;" onclick="apagarEquipamento(${index})">Excluir</button></td>
-      </tr>
-    `;
-  });
-}
-
-function atualizarSelectDeleteSetor(){
-  const sel = document.getElementById("selecionarSetorDel");
-  sel.innerHTML = "";
-  setores.forEach(s=>{
-    sel.innerHTML += `<option value="${s}">${s}</option>`;
-  });
-}
-
-function confirmarApagarSetor(){
-  const setor = document.getElementById("selecionarSetorDel").value;
-  if(!setor) return;
-  if(!confirm(`Tem certeza que deseja apagar o setor "${setor}" e todos os equipamentos dele?`)) return;
-
-  setores = setores.filter(s => s !== setor);
-  equipamentos = equipamentos.filter(e => e.setor !== setor);
-
-  salvarSetores();
-  salvarEquipamentos();
-  montarSetores();
-  fecharModalDelSetor();
-}
-
-function apagarEquipamento(index){
-  if(!confirm("Tem certeza que deseja apagar este equipamento?")) return;
-
-  equipamentos.splice(index, 1);
-  salvarEquipamentos();
-  montarSetores();
-}
-
-function abrirModal(o){
-  document.getElementById("md-tombo").innerHTML = "<b>Tombo:</b> " + o.tombo;
-  document.getElementById("md-matricula").innerHTML = "<b>Matrícula:</b> " + o.matricula;
-  document.getElementById("md-desc").innerHTML = "<b>Descrição:</b> " + o.descricao;
-  document.getElementById("md-status").innerHTML = "<b>Status:</b> " + o.status;
-  document.getElementById("md-local").innerHTML = "<b>Local:</b> " + o.local;
-  document.getElementById("md-data").innerHTML = "<b>Data:</b> " + o.data;
-
-  document.getElementById("modalBg").style.display = "flex";
-}
-
-function fecharModal(){ document.getElementById("modalBg").style.display = "none"; }
-
-const modalAddSetor = document.getElementById("modalAddSetor");
-const modalDelSetor = document.getElementById("modalDelSetor");
-const btnAddSetor = document.getElementById("btnAddSetor");
-const btnDelSetor = document.getElementById("btnDelSetor");
-const novoSetorInput = document.getElementById("novoSetorNome");
-
-btnAddSetor.onclick = ()=>{
-  novoSetorInput.value = "";
-  modalAddSetor.style.display = "flex";
-  novoSetorInput.focus();
-};
-
-btnDelSetor.onclick = ()=>{
-  atualizarSelectDeleteSetor();
-  modalDelSetor.style.display = "flex";
-};
-
-function fecharModalAddSetor(){ modalAddSetor.style.display = "none"; }
-function fecharModalDelSetor(){ modalDelSetor.style.display = "none"; }
-
-function adicionarSetor(){
-  const nome = novoSetorInput.value.trim();
-  if(!nome) return alert("Digite um nome válido.");
-
-  setores.push(nome);
-  salvarSetores();
-  montarSetores();
-  fecharModalAddSetor();
-}
-
-const modalAddEquip = document.getElementById("modalAddEquip");
-const btnAddEquip = document.getElementById("btnAddEquip");
-
-const equipTombo = document.getElementById("equipTombo");
-const equipNome = document.getElementById("equipNome");
-const equipSetor = document.getElementById("equipSetor");
-
-btnAddEquip.onclick = ()=>{
-  equipTombo.value = "";
-  equipNome.value = "";
-  modalAddEquip.style.display = "flex";
-};
-
-function fecharModalAddEquip(){ modalAddEquip.style.display = "none"; }
-
-function atualizarOpcoesSetor(){
-  equipSetor.innerHTML = '<option value="">Selecione o setor</option>';
-  setores.forEach(s=>{
-    equipSetor.innerHTML += `<option value="${s}">${s}</option>`;
-  });
-}
-
-function adicionarEquipamento(){
-  const tombo = equipTombo.value.trim();
-  const nome = equipNome.value.trim();
-  const setor = equipSetor.value;
-
-  if(!tombo || !nome || !setor)
-    return alert("Preencha todos os campos.");
-
-  const dataAtual = new Date();
-  const dataFormatada =
-    `${dataAtual.getDate()}/${dataAtual.getMonth()+1}/${dataAtual.getFullYear()} ${dataAtual.getHours()}:${String(dataAtual.getMinutes()).padStart(2, "0")}`;
-
-  const novoItem = {
-    setor,
-    tombo,
-    descricao:nome,
-    status:"Ok",
-    local:setor,
-    data:dataFormatada,
-    matricula:"0000"
-  };
-
-  equipamentos.push(novoItem);
-  salvarEquipamentos();
-  montarSetores();
-  fecharModalAddEquip();
-}
-
-montarSetores();
-</script>
-
+    loadAccordion();
+  </script>
 </body>
 </html>
