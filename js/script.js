@@ -60,11 +60,9 @@ function configurarInterfaceUsuario() {
 
     } else {
 
-        // Aluno → limita
         if (btnAdmin) btnAdmin.style.display = "none";
         if (linkEquip) linkEquip.style.display = "none"; 
 
-        // Relatar permanece visível
         if (linkRelatar) linkRelatar.style.display = "inline-block";
     }
 }
