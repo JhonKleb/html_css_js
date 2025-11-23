@@ -173,7 +173,6 @@
     const turma = document.getElementById("turma").value.trim();
     const termos = document.getElementById("termos").checked;
 
-    // ⚠️ Verificação de campos obrigatórios
     if (!matricula || !nome || !email || !senha) {
       alert("Preencha todos os campos obrigatórios!");
       return;
@@ -184,7 +183,6 @@
       return;
     }
 
-    // 📦 Montagem do JSON conforme API
     const dados = {
       matricula: parseInt(matricula),
       nome: nome,
@@ -192,7 +190,6 @@
       senha: senha,
     };
 
-    // Se tiver turma, envia como aluno
     if (turma !== "") {
       dados.turma = turma;
     }
@@ -210,7 +207,7 @@
 
       if (resposta.status === 201) {
         alert("Conta criada com sucesso! Matrícula: " + resultado.matricula);
-        window.location.href = "login.html"; // redirecionamento opcional
+        window.location.href = "login.html"; 
       } else {
         alert(resultado.message || "Erro ao criar conta.");
       }
