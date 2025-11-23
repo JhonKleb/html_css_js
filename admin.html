@@ -128,7 +128,6 @@
 <body>
 
   <script>
-    // 🔥 BLOQUEIO: somente servidor pode acessar admin
     const tipo = localStorage.getItem("tipoUsuario");
 
     if (tipo !== "servidor") {
@@ -148,7 +147,6 @@
   </header>
 
   <script>
-    // 🔥 remove botões caso não seja servidor (por segurança extra)
     if (localStorage.getItem("tipoUsuario") !== "servidor") {
         document.getElementById("btnEquip")?.remove();
         document.getElementById("btnAdmin")?.remove();
