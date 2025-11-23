@@ -80,9 +80,7 @@
       transition:.2s;
     }
 
-    .profile-pic:hover{
-      transform:scale(1.05);
-    }
+    .profile-pic:hover{ transform:scale(1.05); }
 
     .container{width:100%;max-width:1100px;}
 
@@ -117,9 +115,7 @@
       transition:transform 0.25s ease;
     }
 
-    .accordion-item:hover{
-      transform: translateY(-1px);
-    }
+    .accordion-item:hover{ transform: translateY(-1px); }
 
     .accordion-header{
       padding:14px 18px;
@@ -185,9 +181,7 @@
       transition:background .25s;
     }
 
-    .btn-detalhar:hover{
-      background:#00cc6a;
-    }
+    .btn-detalhar:hover{ background:#00cc6a; }
 
     .modal-bg{
       position:fixed;
@@ -220,7 +214,6 @@
       color:#fff;
     }
 
-    .modal p{margin:8px 0; color:#dfe6df; font-size:14px}
     .modal .close{
       margin-top:14px;background:#ff5555;color:#fff;
       border:none;padding:8px 12px;border-radius:8px;cursor:pointer
@@ -236,11 +229,11 @@
 
   <div class="container">
     <section class="section">
-      <h2>Todos os Equipamentos por Setor</h2>
+      <h2>Todos os Equipamentos por Localização</h2>
 
       <div class="action-buttons" id="actionButtons">
         <button id="btnAddEquip" class="btn-detalhar">Adicionar Equipamento</button>
-        <button id="btnAddSetor" class="btn-detalhar">Adicionar Setor</button>
+        <button id="btnAddSetor" class="btn-detalhar">Adicionar Localização</button>
       </div>
 
       <div id="accordionContainer"></div>
@@ -250,20 +243,28 @@
   <!-- Modal Adicionar Setor -->
   <div class="modal-bg" id="modalSetor">
     <div class="modal">
-      <h3>Adicionar Setor</h3>
-      <input type="text" id="nomeSetorInput" placeholder="Nome do Setor" />
+      <h3>Adicionar Localização</h3>
+      <input type="text" id="nomeSetorInput" placeholder="Localização" />
       <button id="salvarSetor" class="btn-detalhar">Salvar</button>
       <button class="close" onclick="closeModal('modalSetor')">Fechar</button>
     </div>
   </div>
 
-  <!-- Modal Adicionar Equipamento -->
+  <!-- Modal Adicionar Equipamento (SELECT de SETORES incluído) -->
   <div class="modal-bg" id="modalEquip">
     <div class="modal">
       <h3>Adicionar Equipamento</h3>
+
       <input type="text" id="tomboInput" placeholder="Tombo" />
       <input type="text" id="descricaoInput" placeholder="Descrição" />
-      <input type="text" id="setorInput" placeholder="Setor" />
+
+      <!-- SELECT DE SETORES AQUI -->
+      <select id="setorSelect">
+        <option value="">Selecione o Setor</option>
+      </select>
+
+      <input type="text" id="situacaoInput" placeholder="Situação (Ex: funcionando, quebrado...)" />
+
       <button id="salvarEquip" class="btn-detalhar">Salvar</button>
       <button class="close" onclick="closeModal('modalEquip')">Fechar</button>
     </div>
@@ -272,8 +273,8 @@
   <script>
     const API_URL = "http://localhost:5000";
 
-    // ----- HEADER DINÂMICO -----
-    const tipo = localStorage.getItem("tipoUsuario"); // 'aluno' ou 'servidor'
+    // HEADER DINÂMICO
+    const tipo = localStorage.getItem("tipoUsuario");
     const nav = document.getElementById("navLinks");
     const fotoSalva = localStorage.getItem("fotoPerfil");
 
@@ -299,15 +300,25 @@
     }
 
     async function fetchSetores() {
-      const res = await fetch(`${API_URL}/setores`);
-      const data = await res.json();
-      return data.Setores || [];
+      try {
+        const res = await fetch(`${API_URL}/setores`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.Setores || [];
+      } catch {
+        return [];
+      }
     }
 
     async function fetchPatrimonio() {
-      const res = await fetch(`${API_URL}/patrimonio`);
-      const data = await res.json();
-      return data.patrimonio_completo || [];
+      try {
+        const res = await fetch(`${API_URL}/patrimonio`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.patrimonio_completo || [];
+      } catch {
+        return [];
+      }
     }
 
     function createAccordionItem(setor, equipamentos) {
@@ -323,7 +334,8 @@
 
       const table = document.createElement('table');
       const thead = document.createElement('thead');
-      thead.innerHTML = `<tr>
+      thead.innerHTML = `
+        <tr>
           <th>Tombo</th>
           <th>Descrição</th>
           <th>Situação</th>
@@ -333,15 +345,15 @@
 
       const tbody = document.createElement('tbody');
       equipamentos.forEach(eq => {
-        if(eq.setor === setor.nome_setor){
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${eq.tombo}</td>
-                          <td>${eq.descricao}</td>
-                          <td>${eq.situacao}</td>
-                          <td>${eq.local}</td>`;
-          tbody.appendChild(tr);
-        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${eq.tombo ?? ''}</td>
+          <td>${eq.descricao ?? ''}</td>
+          <td>${eq.situacao ?? ''}</td>
+          <td>${eq.local ?? ''}</td>`;
+        tbody.appendChild(tr);
       });
+
       table.appendChild(tbody);
       content.appendChild(table);
 
@@ -358,66 +370,113 @@
     async function loadAccordion() {
       const container = document.getElementById('accordionContainer');
       container.innerHTML = '';
+
       const setores = await fetchSetores();
       const patrimonio = await fetchPatrimonio();
 
       setores.forEach(setor => {
-        const eqs = patrimonio.filter(p => p.setor === setor.nome_setor);
+        const eqs = patrimonio.filter(
+          p => (p.local || p.setor || '').toString() === setor.nome_setor
+        );
         const item = createAccordionItem(setor, eqs);
         container.appendChild(item);
       });
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function openModal(id){
+      document.getElementById(id).style.display = 'flex';
+
+      if(id === "modalEquip") loadSelectSetores();
+    }
+
+    function closeModal(id){ document.getElementById(id).style.display = 'none'; }
 
     document.getElementById('btnAddSetor').addEventListener('click', () => openModal('modalSetor'));
     document.getElementById('btnAddEquip').addEventListener('click', () => openModal('modalEquip'));
 
+    // PREENCHE O SELECT DE SETORES
+    async function loadSelectSetores() {
+      const setorSelect = document.getElementById("setorSelect");
+      setorSelect.innerHTML = `<option value="">Selecione o Setor</option>`;
+
+      const setores = await fetchSetores();
+      setores.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.nome_setor;
+        opt.textContent = s.nome_setor;
+        setorSelect.appendChild(opt);
+      });
+    }
+
+    // ADICIONAR SETOR
     document.getElementById('salvarSetor').addEventListener('click', async () => {
       const nomeSetor = document.getElementById('nomeSetorInput').value.trim();
-      if(!nomeSetor) return alert("Digite o nome do setor!");
-      const res = await fetch(`${API_URL}/addsetor`, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({Setor: nomeSetor})
-      });
-      if(res.ok){
-        alert("Setor adicionado com sucesso!");
-        closeModal('modalSetor');
-        loadAccordion();
-        document.getElementById('nomeSetorInput').value = '';
-      } else {
-        const err = await res.json();
-        alert(err.message || "Erro ao adicionar setor");
+      if(!nomeSetor) return alert("Digite o nome da Localização!");
+
+      try {
+        const res = await fetch(`${API_URL}/addsetor`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ Setor: nomeSetor })
+        });
+
+        if(res.ok){
+          alert("Localização adicionada com sucesso!");
+          closeModal('modalSetor');
+          loadAccordion();
+          document.getElementById('nomeSetorInput').value = '';
+        } else {
+          alert("Erro ao adicionar setor.");
+        }
+      } catch (e){
+        alert("Erro de conexão ao adicionar setor");
       }
     });
 
+    // ADICIONAR EQUIPAMENTO (select + situação)
     document.getElementById('salvarEquip').addEventListener('click', async () => {
-      const tombo = document.getElementById('tomboInput').value.trim();
+      const tomboRaw = document.getElementById('tomboInput').value.trim();
       const descricao = document.getElementById('descricaoInput').value.trim();
-      const setor = document.getElementById('setorInput').value.trim();
+      const setor = document.getElementById('setorSelect').value.trim();
+      const situacao = document.getElementById('situacaoInput').value.trim();
 
-      if(!tombo || !descricao || !setor) return alert("Preencha todos os campos!");
-      const res = await fetch(`${API_URL}/insobj`, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          Tombo: tombo,
-          Descrição: descricao,
-          Setor: setor
-        })
-      });
-      if(res.ok){
-        alert("Equipamento adicionado com sucesso!");
-        closeModal('modalEquip');
-        loadAccordion();
-        document.getElementById('tomboInput').value = '';
-        document.getElementById('descricaoInput').value = '';
-        document.getElementById('setorInput').value = '';
-      } else {
-        const err = await res.json();
-        alert(err.message || "Erro ao adicionar equipamento");
+      if(!tomboRaw || !descricao || !setor || !situacao)
+        return alert("Preencha todos os campos!");
+
+      const tombo = parseInt(tomboRaw, 10);
+      if(Number.isNaN(tombo)) return alert("Tombo deve ser um número inteiro!");
+
+      const codigo = `EQ${tombo}`;
+
+      const payload = {
+        tombo: tombo,
+        descricao: descricao,
+        local: setor,
+        situacao: situacao,
+        codigo: codigo
+      };
+
+      try {
+        const res = await fetch(`${API_URL}/addequipamento`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if(res.ok){
+          alert("Equipamento adicionado com sucesso!");
+          closeModal('modalEquip');
+          loadAccordion();
+
+          document.getElementById('tomboInput').value = '';
+          document.getElementById('descricaoInput').value = '';
+          document.getElementById('setorSelect').selectedIndex = 0;
+          document.getElementById('situacaoInput').value = '';
+        } else {
+          alert("Erro ao adicionar equipamento.");
+        }
+      } catch (e){
+        alert("Erro de conexão ao adicionar equipamento");
       }
     });
 
