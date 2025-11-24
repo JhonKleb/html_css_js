@@ -160,6 +160,19 @@
 </div>
 
 <script>
+  const fotoSalva = localStorage.getItem("fotoPerfil");
+  const nomeSalvo = localStorage.getItem("nomeUsuario"); 
+
+  if (fotoSalva) {
+    document.getElementById("fotoConfig").src = fotoSalva;
+  }
+
+  if (nomeSalvo) {
+    document.getElementById("nomeConfig").textContent = nomeSalvo;
+  }
+</script>
+
+<script>
 async function carregarDadosUsuario() {
   const matricula = localStorage.getItem("matriculaLogada");
   const tipo = localStorage.getItem("tipoUsuario");
