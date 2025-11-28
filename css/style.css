@@ -61,3 +61,25 @@ form button {
 form button:hover {
   background-color: #00cc6a;
 }
+ .create-account-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 6px;
+  background: transparent;     /* SEM FUNDO */
+  color: #fff;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: 0.25s ease;
+}
+
+/* Ao passar o mouse */
+.create-account-btn:hover {
+  animation: hoverColorShiftBorder 0.4s forwards ease-out;
+  transform: scale(1.05);
+}
+
+/* Ao clicar */
+.create-account-btn:active {
+  animation: clickFlashBorder 0.15s forwards ease-out;
+  transform: scale(0.95);
+}
